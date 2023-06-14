@@ -27,12 +27,6 @@ def get_user_details():
     contact = get_valid_contact()
     return name, email, contact
 
-try:
-    name, email, contact = get_user_details()
-    print('Thanks for your details')
-except Exception as e:
-    print(str(e))
-
 def choose_industry_options():
     industries = {
         '1': 'Insurance',
@@ -55,14 +49,6 @@ def choose_industry_options():
             return [industries[opt] for opt in options]
         else:
             print("Please choose valid option(s)")
-
-try:
-    options = choose_industry_options()
-    print("Thank you for choosing your industry option(s).")
-    print("Selected industry option(s):", ", ".join(options))
-except Exception as e:
-    print(str(e))
-
 
 def choose_vertical_option():
     verticals = ['ML/DS/AI', 'Sales force', 'Microsoft dynamics', 'Custom app', 'Others']
@@ -90,10 +76,6 @@ def choose_vertical_option():
     print("Thank you for choosing your vertical option(s).")
     print("Selected vertical(s):", ", ".join(selected_verticals))
 
-
-choose_vertical_option()
-
-
 def choose_requirements():
     requirements = ["Start the project from scratch", "Require support from existing project", "Looking for some kind of solutions", "Others"]
     print("Please choose your requirements:")
@@ -119,9 +101,6 @@ def choose_requirements():
 
     print("Thank you for choosing your requirement(s).")
     print("Selected requirement(s):", ", ".join(selected_requirements))
-
-
-choose_requirements()
 
 def choose_known_source():
     known_sources = [
@@ -151,11 +130,74 @@ def choose_known_source():
             return known_source_str
         else:
             print("Invalid option. Please choose a valid option.")
+            
+            
+def issue_escalation_options():
+    issue_escalation = {
+        '1': 'Team Lead',
+        '2': 'Sales Person',
+        '3': 'Escalate Issue'
+    }
+    valid_options = issue_escalation.keys()
+    while True:
+        print("Who would you like to speak to?")
+        for option, person in issue_escalation.items():
+            print(f"{option}. {person}")
+        option = input("Your choice: ")
+        options = [opt.strip() for opt in option.split(',') if opt.strip() in valid_options]
+        if options:
+            return [issue_escalation[opt] for opt in options]
+        else:
+            print("Please choose valid option(s)")
+            
+def issue_type():
+    while True:
+        print("Is your issue normal or urgent?")
+        issue_type_options = ['1. normal', '2. urgent']
+        response = input("Enter '1' for normal or '2' for urgent: ")
+        if response == "1":
+            print("Thank you. We have saved your issue and will contact you as soon as possible.")
+            break  # Exit the loop when a valid option is chosen
+        elif response == "2":
+            print("Thank you. We have saved your issue as urgent and will contact you immediately.")
+            break  # Exit the loop when a valid option is chosen
+        else:
+            print("Sorry, I didn't understand your response. Please try again.")
 
-try:
-    known_source = choose_known_source()
-    print("Thank you!")
-    print("Selected known source:", known_source)
-except Exception as e:
-    print(str(e))
+client_type = input("Can you please let me know if you are a? (Enter 1 for new client, 2 for existing client, 3 for job seeker): ")
 
+if client_type == '1':
+    print("Welcome, New client!")
+    try:
+        name, email, contact = get_user_details()
+        print('Thanks for your details')
+        industry_options = choose_industry_options()
+        choose_vertical_option()
+        choose_requirements()
+        known_source = choose_known_source()
+    except Exception as e:
+        print(str(e))
+
+elif client_type == '2':
+    print("Welcome, existing client!")
+    try:
+        name, email, contact = get_user_details()
+        print('Thanks for updating your details')
+        choose_vertical_option()
+        selected_issue_escalation = issue_escalation_options()
+        print("Thank you for choosing option(s).")
+        print("Selected option(s):", ", ".join(selected_issue_escalation))
+        issue_type()
+    except Exception as e:
+        print(str(e))
+
+elif client_type == '3':
+    print("Welcome, Job seeker!")
+    try:
+        name, email, contact = get_user_details()
+        print('Thanks for providing your details')
+    except Exception as e:
+        print(str(e))
+
+else:
+    print("Invalid option. Please choose a valid option.")
