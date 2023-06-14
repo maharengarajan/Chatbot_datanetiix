@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 def get_valid_name():
     name = input("Please enter your name: ")
@@ -163,6 +164,64 @@ def issue_type():
             break  # Exit the loop when a valid option is chosen
         else:
             print("Sorry, I didn't understand your response. Please try again.")
+            
+def category():
+    while True:
+        user_type = input("Are you an experienced or fresher? (Enter 1 for experienced, 2 for fresher): ")
+        if user_type == "1":
+            user_category = "experienced"
+            break  # Exit the loop when a valid option is chosen
+        elif user_type == "2":
+            user_category = "fresher"
+            break  # Exit the loop when a valid option is chosen
+        else:
+            print("Invalid input. Please try again.")
+    return user_category
+
+
+def availability_check():
+    while True:
+        interview_avail = input("Are you available for an interview? (1 for yes, 2 for no): ")
+        if interview_avail == "1":
+            interview_available = "yes"
+            while True:
+                try:
+                    time_avail = input("What is your time availability for an interview? (Please enter a date in dd/mm/yyyy format): ")
+                    datetime.strptime(time_avail, "%d/%m/%Y")
+                    if datetime.strptime(time_avail, "%d/%m/%Y").date() < datetime.now().date():
+                        print("Please enter a valid future date")
+                    else:
+                        break
+                except ValueError:
+                    print("Invalid date format. Please enter the date in dd/mm/yyyy format.")
+                    
+            while True:
+                joining_date = input("When can you join? (1 for 30 days/2 for 60 days/3 for 90 days): ")
+                if joining_date == '1':
+                    joining_date = 30
+                    break
+                elif joining_date == '2':
+                    joining_date = 60
+                    break
+                elif joining_date == '3':
+                    joining_date = 90
+                    break
+                else:
+                    print("Invalid input. Please select a valid option.")
+            
+            break  # Exit the loop when valid options are chosen
+            
+        elif interview_avail == "2":
+            interview_available = "no"
+            print("Thank you for your time. We will get in touch with you later.")
+            break  # Exit the loop when valid option is chosen
+
+        else:
+            print("Invalid input. Please select a valid option.")
+
+    if interview_available == "yes":
+        print("Thanks for the details. We will schedule an interview with you soon.")
+
 
 client_type = input("Can you please let me know if you are a? (Enter 1 for new client, 2 for existing client, 3 for job seeker): ")
 
@@ -196,6 +255,10 @@ elif client_type == '3':
     try:
         name, email, contact = get_user_details()
         print('Thanks for providing your details')
+        user_category = category()
+        print(f"You selected {user_category} category.")
+        choose_vertical_option()
+        availability_check()
     except Exception as e:
         print(str(e))
 
