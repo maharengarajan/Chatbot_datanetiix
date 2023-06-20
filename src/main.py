@@ -1,5 +1,8 @@
 import re
 from datetime import datetime
+from database import create_database, insert_new_client, insert_existing_client, insert_job_seeker
+
+create_database()
 
 def get_valid_name():
     name = input("Please enter your name: ")
@@ -76,6 +79,7 @@ def choose_vertical_option():
 
     print("Thank you for choosing your vertical option(s).")
     print("Selected vertical(s):", ", ".join(selected_verticals))
+    return selected_verticals
 
 def choose_requirements():
     requirements = ["Start the project from scratch", "Require support from existing project", "Looking for some kind of solutions", "Others"]
@@ -102,6 +106,7 @@ def choose_requirements():
 
     print("Thank you for choosing your requirement(s).")
     print("Selected requirement(s):", ", ".join(selected_requirements))
+    return selected_requirements
 
 def choose_known_source():
     known_sources = [
@@ -131,8 +136,7 @@ def choose_known_source():
             return known_source_str
         else:
             print("Invalid option. Please choose a valid option.")
-            
-            
+
 def issue_escalation_options():
     issue_escalation = {
         '1': 'Team Lead',
@@ -150,7 +154,7 @@ def issue_escalation_options():
             return [issue_escalation[opt] for opt in options]
         else:
             print("Please choose valid option(s)")
-            
+
 def issue_type():
     while True:
         print("Is your issue normal or urgent?")
@@ -158,13 +162,13 @@ def issue_type():
         response = input("Enter '1' for normal or '2' for urgent: ")
         if response == "1":
             print("Thank you. We have saved your issue and will contact you as soon as possible.")
-            break  # Exit the loop when a valid option is chosen
+            return ["normal"]  # Return as a list
         elif response == "2":
             print("Thank you. We have saved your issue as urgent and will contact you immediately.")
-            break  # Exit the loop when a valid option is chosen
+            return ["urgent"]  # Return as a list
         else:
             print("Sorry, I didn't understand your response. Please try again.")
-            
+
 def category():
     while True:
         user_type = input("Are you an experienced or fresher? (Enter 1 for experienced, 2 for fresher): ")
@@ -178,49 +182,45 @@ def category():
             print("Invalid input. Please try again.")
     return user_category
 
-
-def availability_check():
+def interview_available_check():
     while True:
         interview_avail = input("Are you available for an interview? (1 for yes, 2 for no): ")
         if interview_avail == "1":
             interview_available = "yes"
-            while True:
-                try:
-                    time_avail = input("What is your time availability for an interview? (Please enter a date in dd/mm/yyyy format): ")
-                    datetime.strptime(time_avail, "%d/%m/%Y")
-                    if datetime.strptime(time_avail, "%d/%m/%Y").date() < datetime.now().date():
-                        print("Please enter a valid future date")
-                    else:
-                        break
-                except ValueError:
-                    print("Invalid date format. Please enter the date in dd/mm/yyyy format.")
-                    
-            while True:
-                joining_date = input("When can you join? (1 for 30 days/2 for 60 days/3 for 90 days): ")
-                if joining_date == '1':
-                    joining_date = 30
-                    break
-                elif joining_date == '2':
-                    joining_date = 60
-                    break
-                elif joining_date == '3':
-                    joining_date = 90
-                    break
-                else:
-                    print("Invalid input. Please select a valid option.")
-            
-            break  # Exit the loop when valid options are chosen
-            
+            return interview_available
         elif interview_avail == "2":
             interview_available = "no"
             print("Thank you for your time. We will get in touch with you later.")
-            break  # Exit the loop when valid option is chosen
-
+            return interview_available
         else:
             print("Invalid input. Please select a valid option.")
 
-    if interview_available == "yes":
-        print("Thanks for the details. We will schedule an interview with you soon.")
+def date_of_interview():
+    while True:
+        try:
+            time_avail = input("What is your time availability for an interview? (Please enter a date in dd/mm/yyyy format): ")
+            datetime.strptime(time_avail, "%d/%m/%Y")
+            if datetime.strptime(time_avail, "%d/%m/%Y").date() < datetime.now().date():
+                print("Please enter a valid future date")
+            else:
+                return time_avail
+        except ValueError:
+            print("Invalid date format. Please enter the date in dd/mm/yyyy format.")
+
+def notice_period():
+    while True:
+        joining_date = input("When can you join? (1 for 30 days/2 for 60 days/3 for 90 days): ")
+        if joining_date == '1':
+            joining_date = 30
+            return joining_date
+        elif joining_date == '2':
+            joining_date = 60
+            return joining_date
+        elif joining_date == '3':
+            joining_date = 90
+            return joining_date
+        else:
+            print("Invalid input. Please select a valid option.")
 
 
 client_type = input("Can you please let me know if you are a? (Enter 1 for new client, 2 for existing client, 3 for job seeker): ")
@@ -231,9 +231,14 @@ if client_type == '1':
         name, email, contact = get_user_details()
         print('Thanks for your details')
         industry_options = choose_industry_options()
-        choose_vertical_option()
-        choose_requirements()
+        vertical_options = choose_vertical_option()
+        requirement_options = choose_requirements()
         known_source = choose_known_source()
+        
+        # Insert new client into the database
+        insert_new_client(name, email, contact, industry_options, vertical_options, requirement_options, known_source)
+
+        
     except Exception as e:
         print(str(e))
 
@@ -242,11 +247,15 @@ elif client_type == '2':
     try:
         name, email, contact = get_user_details()
         print('Thanks for updating your details')
-        choose_vertical_option()
-        selected_issue_escalation = issue_escalation_options()
+        vertical_options = choose_vertical_option()
+        issue_escalation = issue_escalation_options()
         print("Thank you for choosing option(s).")
-        print("Selected option(s):", ", ".join(selected_issue_escalation))
-        issue_type()
+        #print("Selected option(s):", ", ".join(selected_issue_escalation))
+        issue_option = issue_type()
+        
+        # Insert existing client into the database
+        insert_existing_client(name, email, contact, vertical_options, issue_escalation , issue_option)
+        
     except Exception as e:
         print(str(e))
 
@@ -257,8 +266,14 @@ elif client_type == '3':
         print('Thanks for providing your details')
         user_category = category()
         print(f"You selected {user_category} category.")
-        choose_vertical_option()
-        availability_check()
+        vertical_options =choose_vertical_option()
+        interview_avail =interview_available_check()
+        time_avail=date_of_interview()
+        joining_date=notice_period()
+        
+        # Insert existing client into the database
+        insert_job_seeker(name, email, contact,user_category, vertical_options, interview_avail, time_avail, joining_date)
+        
     except Exception as e:
         print(str(e))
 
