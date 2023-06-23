@@ -1,6 +1,9 @@
 import requests
 import re
 from datetime import datetime
+from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database
+
+create_database()
 
 def get_ip_address():
     response = requests.get('https://api.ipify.org').text
@@ -253,10 +256,14 @@ if client_type == '1':
     print("Welcome, New client!")
     try:
         name, email, contact = get_user_details()
-        indutry_options = choose_industries_option()
+        industry_options = choose_industries_option()
         vertical_options = choose_vertical_option()
         requirement_option = choose_requirement()
         known_source = choose_known_source()
+        
+        # Insert new client into the database
+        insert_new_client(name, email, contact, industry_options, vertical_options, requirement_option, known_source)
+
     except Exception as e:
         print(str(e))
 
@@ -267,6 +274,10 @@ elif client_type == '2':
         vertical_options = choose_vertical_option()
         issue_escalation = issue_escalation()
         issue_type = issue_type()
+        
+        # Insert existing client into the database
+        insert_existing_client(name, email, contact, vertical_options, issue_escalation , issue_type)
+        
     except Exception as e:
         print(str(e))
         
@@ -275,9 +286,14 @@ elif client_type == '3':
     try:
         name, email, contact = get_user_details()
         user_category = category()
+        vertical_options = choose_vertical_option()
         is_available = interview_available_check()
         interview_date = date_of_interview()
         joining_date =notice_period()
+        
+        # Insert existing client into the database
+        insert_job_seeker(name, email, contact,user_category, vertical_options, is_available, interview_date, joining_date)
+        
     except Exception as e:
         print(str(e))
                 

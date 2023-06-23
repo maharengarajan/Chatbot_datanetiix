@@ -1,5 +1,6 @@
 import mysql.connector as conn
 import datetime
+import sys
 
 def create_database():
     # Connection from Python to MySQL
@@ -17,8 +18,8 @@ def create_database():
     cursor.execute('CREATE TABLE IF NOT EXISTS chatbot_priya.Job_Seeker(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER BIGINT(255), CATEGORY VARCHAR(255), VERTICAL VARCHAR(255), INTERVIEW_AVAILABLE VARCHAR(255), TIME_AVAILABLE VARCHAR(255), NOTICE_PERIOD VARCHAR(255))')
     
     # Get current date and time
-    current_date = datetime.now().date()
-    current_time = datetime.now().time()
+    current_date = datetime.datetime.now().date()
+    current_time = datetime.datetime.now().time()
     
     cursor.close()
     mydb.close()
@@ -28,8 +29,8 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
     cursor = mydb.cursor()
 
     # Get current date and time
-    current_date = datetime.now().date()
-    current_time = datetime.now().time()
+    current_date = datetime.datetime.now().date()
+    current_time = datetime.datetime.now().time()
     
      # Convert lists to strings
     industry_str = ','.join(industry_options)
@@ -37,7 +38,7 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
 
     # Prepare the SQL query to insert data into the table
     query = "INSERT INTO New_Client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, INDUSTRY, VERTICAL, REQUIREMENTS, KNOWN_SOURCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    values = (current_date, current_time, name, email, contact_number, industry_str, vertical_str, requirement_option, known_source)
+    values = (current_date, current_time, name, email, contact, industry_str, vertical_str, requirement_option, known_source)
 
     
     # Execute the query
@@ -55,8 +56,8 @@ def insert_existing_client(name, email, contact, vertical_options, issue_escalat
     cursor = mydb.cursor()
     
     # Get current date and time
-    current_date = datetime.now().date()
-    current_time = datetime.now().time()
+    current_date = datetime.datetime.now().date()
+    current_time = datetime.datetime.now().time()
     
     # Convert lists to strings
     vertical_str = ','.join(vertical_options)
@@ -80,8 +81,8 @@ def insert_job_seeker(name, email, contact, user_category, vertical_options, is_
     cursor = mydb.cursor()
     
     # Get current date and time
-    current_date = datetime.now().date()
-    current_time = datetime.now().time()
+    current_date = datetime.datetime.now().date()
+    current_time = datetime.datetime.now().time()
     
     # Convert lists to strings
     vertical_str = ','.join(vertical_options)
