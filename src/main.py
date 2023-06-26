@@ -294,7 +294,10 @@ elif client_type == '3':
         user_category = category()
         vertical_options = choose_vertical_option()
         is_available = interview_available_check()
-        interview_date = date_of_interview()
+        if is_available == "yes":
+            interview_date = date_of_interview()
+        else:
+            interview_date = None
         joining_date =notice_period()
         
         # Insert existing client into the database
