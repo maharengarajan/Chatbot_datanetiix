@@ -16,7 +16,7 @@ def get_location():
     return location_data
 
 def get_weather(city):
-    api_key = "01e6399113b4c255c497958efccc0dc9"  # Weather API key
+    api_key = "01e6399113b4c255c497958efccc0dc9" # Weather API key
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
     response = requests.get(url).json()
 
