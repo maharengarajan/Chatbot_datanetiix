@@ -2,8 +2,14 @@ import requests
 import re
 from datetime import datetime
 from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database
+from dotenv import load_dotenv
+import os
+
 
 create_database()
+
+def configure():
+    load_dotenv()
 
 def get_ip_address():
     response = requests.get('https://api.ipify.org').text
@@ -16,8 +22,8 @@ def get_location():
     return location_data
 
 def get_weather(city):
-    api_key = "01e6399113b4c255c497958efccc0dc9" # Weather API key
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
+    configure()
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('api_key')}"
     response = requests.get(url).json()
 
     if response['cod'] == 200:
