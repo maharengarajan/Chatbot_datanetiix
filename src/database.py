@@ -141,4 +141,45 @@ def extract_new_client_details():
     # Close the cursor and connection
     cursor.close()
     mydb.close()
+
+def extract_existing_client_details():
+    #connection to mysql database
+    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    
+    #create cursor object to execute SQL queries
+    cursor = mydb.cursor()
+    
+    #execute sql query to retrive new_client details
+    query = "SELECT * FROM existing_client ORDER BY id DESC LIMIT 1" #we can get the row with highest id value 
+    cursor.execute(query)
+    
+    # Fetch the result
+    result = cursor.fetchone() #getting only one row
+
+    if result:
+        # Extract the columns from the result
+        id, date, time, name, email, contact, selected_vertical, issue_escalation, issue_type = result
+
+        # Extracted new_client details stored in dictionary format
+        existing_client_details = {
+            'id': id,
+            'date': date,
+            'time': time,
+            'name': name,
+            'email': email,
+            'contact': contact,
+            'verticals_choosen': selected_vertical,
+            'issue_escalation': issue_escalation,
+            'issue_type': issue_type
+        }
+
+        return existing_client_details
+    else:
+        print("No existing client details found.")
+        return None 
+    
+    # Close the cursor and connection
+    cursor.close()
+    mydb.close()
+
     

@@ -1,7 +1,7 @@
 import requests
 import re
 from datetime import datetime
-from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database, extract_new_client_details
+from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database, extract_new_client_details, extract_existing_client_details
 from alert import send_email
 from dotenv import load_dotenv
 import os
@@ -305,7 +305,26 @@ elif client_type == '2':
         
         # Insert existing client into the database
         insert_existing_client(name, email, contact, vertical_options, issue_escalation , issue_type)
-        
+
+        # Extract the new client details from the database
+        existing_client_details = extract_existing_client_details()
+
+        if existing_client_details:
+            # Send email with the existing client details
+            sender_email = 'photola.datanetiix@gmail.com'
+            receiver_email = 'rengarajan@datanetiix.com'
+            subject = 'chatbot project'
+            email_message = f"Existing client details:\n\n" \
+                            f"Date: {existing_client_details['date']}\n" \
+                            f"Time: {existing_client_details['time']}\n" \
+                            f"Name: {existing_client_details['name']}\n" \
+                            f"Email: {existing_client_details['email']}\n" \
+                            f"Contact: {existing_client_details['contact']}\n" \
+                            f"Verticals: {existing_client_details['verticals_choosen']}\n" \
+                            f"Escalating issue to: {existing_client_details['issue_escalation']}\n" \
+                            f"Type of issue: {existing_client_details['issue_type']}"
+            send_email(sender_email, receiver_email, subject, email_message)
+   
     except Exception as e:
         print(str(e))
         
