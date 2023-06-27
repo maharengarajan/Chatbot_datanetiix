@@ -182,4 +182,46 @@ def extract_existing_client_details():
     cursor.close()
     mydb.close()
 
+def extract_job_seeker_details():
+    #connection to mysql database
+    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    
+    #create cursor object to execute SQL queries
+    cursor = mydb.cursor()
+    
+    #execute sql query to retrive new_client details
+    query = "SELECT * FROM job_seeker ORDER BY id DESC LIMIT 1" #we can get the row with highest id value 
+    cursor.execute(query)
+    
+    # Fetch the result
+    result = cursor.fetchone() #getting only one row
+
+    if result:
+        # Extract the columns from the result
+        id, date, time, name, email, contact, category, selected_vertical, interview_available, time_available, notice_period = result
+
+        # Extracted job_seeker details stored in dictionary format
+        job_seeker_details = {
+            'id': id,
+            'date': date,
+            'time': time,
+            'name': name,
+            'email': email,
+            'contact': contact,
+            'category': category,
+            'verticals_choosen': selected_vertical,
+            'interview_available': interview_available,
+            'time_available': time_available,
+            'notice_period': notice_period
+        }
+
+        return job_seeker_details
+    else:
+        print("No job seeker details found.")
+        return None 
+    
+    # Close the cursor and connection
+    cursor.close()
+    mydb.close()
+
     

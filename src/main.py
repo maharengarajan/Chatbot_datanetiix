@@ -1,7 +1,7 @@
 import requests
 import re
 from datetime import datetime
-from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database, extract_new_client_details, extract_existing_client_details
+from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database, extract_new_client_details, extract_existing_client_details, extract_job_seeker_details
 from alert import send_email
 from dotenv import load_dotenv
 import os
@@ -343,6 +343,27 @@ elif client_type == '3':
         
         # Insert existing client into the database
         insert_job_seeker(name, email, contact,user_category, vertical_options, is_available, interview_date, joining_date)
+
+        # Extract the new client details from the database
+        job_seeker_details = extract_job_seeker_details()
+
+        if job_seeker_details:
+            # Send email with the job seeker details
+            sender_email = 'photola.datanetiix@gmail.com'
+            receiver_email = 'rengarajan@datanetiix.com'
+            subject = 'chatbot project'
+            email_message = f"Job Seeker details:\n\n" \
+                            f"Date: {job_seeker_details['date']}\n" \
+                            f"Time: {job_seeker_details['time']}\n" \
+                            f"Name: {job_seeker_details['name']}\n" \
+                            f"Email: {job_seeker_details['email']}\n" \
+                            f"Contact: {job_seeker_details['contact']}\n" \
+                            f"User category: {job_seeker_details['category']}\n" \
+                            f"Verticals: {job_seeker_details['verticals_choosen']}\n" \
+                            f"Available for Interview: {job_seeker_details['interview_available']}\n" \
+                            f"Available date for interview: {job_seeker_details['time_available']}\n" \
+                            f"Notice period: {job_seeker_details['notice_period']}"
+            send_email(sender_email, receiver_email, subject, email_message)
         
     except Exception as e:
         print(str(e))
