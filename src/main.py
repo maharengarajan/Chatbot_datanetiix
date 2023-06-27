@@ -1,7 +1,8 @@
 import requests
 import re
 from datetime import datetime
-from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database
+from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database, extract_new_client_details
+from alert import send_email
 from dotenv import load_dotenv
 import os
 
@@ -269,6 +270,27 @@ if client_type == '1':
         
         # Insert new client into the database
         insert_new_client(name, email, contact, industry_options, vertical_options, requirement_option, known_source)
+
+        # Extract the new client details from the database
+        new_client_details = extract_new_client_details()
+        
+        if new_client_details:
+            # Send email with the new client details
+            sender_email = 'photola.datanetiix@gmail.com'
+            receiver_email = 'rengarajan@datanetiix.com'
+            subject = 'chatbot project'
+            email_message = f"New client details:\n\n" \
+                            f"Date: {new_client_details['date']}\n" \
+                            f"Time: {new_client_details['time']}\n" \
+                            f"Name: {new_client_details['name']}\n" \
+                            f"Email: {new_client_details['email']}\n" \
+                            f"Contact: {new_client_details['contact']}\n" \
+                            f"Industries: {new_client_details['industries_choosen']}\n" \
+                            f"Verticals: {new_client_details['verticals_choosen']}\n" \
+                            f"Requirements: {new_client_details['requirement']}\n" \
+                            f"Known Source: {new_client_details['known_source']}"
+            send_email(sender_email, receiver_email, subject, email_message)
+
 
     except Exception as e:
         print(str(e))
