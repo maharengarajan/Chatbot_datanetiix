@@ -1,7 +1,8 @@
 import requests
 import re
 from datetime import datetime
-from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database, extract_new_client_details, extract_existing_client_details, extract_job_seeker_details
+from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database
+from database import extract_new_client_details, extract_existing_client_details, extract_job_seeker_details
 from alert import send_email
 from dotenv import load_dotenv
 import os
