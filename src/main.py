@@ -14,12 +14,12 @@ def configure():
     load_dotenv()
 
 def get_ip_address():
-    response = requests.get('https://api.ipify.org').text
+    response = requests.get('https://api.ipify.org').text #completely free 
     return response
 
 def get_location():
     ip_address = get_ip_address()
-    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json()
+    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json() #Up-to 30000 free requests per month (1000 in 24 hours)
     location_data = response.get("city") 
     return location_data
 
@@ -278,9 +278,10 @@ if client_type == '1':
         if new_client_details:
             # Send email with the new client details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'rengarajan@datanetiix.com'
-            subject = 'chatbot project'
-            email_message = f"New client details:\n\n" \
+            receiver_email = 'av@datanetiix.com'
+            subject = 'Datanetiix chatbot project Email alert testing demo'
+            email_message = f"Hi, new user logged in our chatbot, Find the below details for your reference:\n\n" \
+                            f"New client details:\n\n" \
                             f"Date: {new_client_details['date']}\n" \
                             f"Time: {new_client_details['time']}\n" \
                             f"Name: {new_client_details['name']}\n" \
@@ -313,9 +314,10 @@ elif client_type == '2':
         if existing_client_details:
             # Send email with the existing client details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'rengarajan@datanetiix.com'
-            subject = 'chatbot project'
-            email_message = f"Existing client details:\n\n" \
+            receiver_email = 'av@datanetiix.com'
+            subject = 'Datanetiix chatbot project Email alert testing demo'
+            email_message = f"Hi, one of our client logged in our chatbot, Find the below details for your reference:\n\n" \
+                            f"Existing client details:\n\n" \
                             f"Date: {existing_client_details['date']}\n" \
                             f"Time: {existing_client_details['time']}\n" \
                             f"Name: {existing_client_details['name']}\n" \
@@ -351,9 +353,10 @@ elif client_type == '3':
         if job_seeker_details:
             # Send email with the job seeker details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'rengarajan@datanetiix.com'
-            subject = 'chatbot project'
-            email_message = f"Job Seeker details:\n\n" \
+            receiver_email = 'av@datanetiix.com'
+            subject = 'Datanetiix chatbot project Email alert testing demo'
+            email_message = f"Hi, New job seeker logged in our chatbot, Find the below details for your reference:\n\n" \
+                            f"Job Seeker details:\n\n" \
                             f"Date: {job_seeker_details['date']}\n" \
                             f"Time: {job_seeker_details['time']}\n" \
                             f"Name: {job_seeker_details['name']}\n" \
