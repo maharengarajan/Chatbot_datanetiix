@@ -19,13 +19,14 @@ def get_ip_address():
 
 def get_location():
     ip_address = get_ip_address()
-    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json() #Up-to 30000 free requests per month (1000 in 24 hours)
-    location_data = response.get("city") 
-    return location_data
+    response = requests.get(f'https://ipapi.co/{ip_address}/city/').text #Up-to 30000 free requests per month (1000 in 24 hours)
+    city = response
+    return city
 
-def get_weather(city):
+def get_weather():
+    city = get_location()
     configure()
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('api_key')}"
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('weather_api_key')}"
     response = requests.get(url).json()
 
     if response['cod'] == 200:
@@ -34,7 +35,8 @@ def get_weather(city):
     else:
         return "Sorry, I couldn't retrieve the weather information."
 
-def get_weather_greeting(weather_desc):
+def get_weather_greeting():
+    weather_desc = get_weather()
     if weather_desc in ['Thunderstorm', 'Drizzle', 'Rain', 'Snow']:
         return "It seems like there's {} outside. Stay safe!".format(weather_desc)
     elif weather_desc in ['Atmosphere', 'Clear', 'Clouds']:
@@ -251,14 +253,14 @@ def notice_period():
             print("Invalid input. Please select a valid option.")
             
 ip_location = get_location()
-weather_info = get_weather(ip_location)
-weather_info_greet = get_weather_greeting(weather_info)
+weather_info = get_weather()
+weather_info_greet = get_weather_greeting()
 
 greeting = "Hello, buddy! Welcome to Datanetiix! We hope you're connecting from"
-print(greeting, ip_location + " " + weather_info_greet)
+print(greeting, ip_location, weather_info_greet)
 
             
-client_type = input("Can you please let me know if you are a? (Enter 1 for new client, 2 for existing client, 3 for job seeker): ")
+client_type = input("Can you please let me know if you are a? (Enter 1 for new client, 2 for existing client, 3 for job seeker, 4 to exit): ")
 
 if client_type == '1':
     print("Welcome, New client!")
@@ -278,7 +280,7 @@ if client_type == '1':
         if new_client_details:
             # Send email with the new client details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'av@datanetiix.com'
+            receiver_email = 'rengarajan@datanetiix.com'
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, new user logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"New client details:\n\n" \
@@ -314,7 +316,7 @@ elif client_type == '2':
         if existing_client_details:
             # Send email with the existing client details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'av@datanetiix.com'
+            receiver_email = 'rengarajan@datanetiix.com'
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, one of our client logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"Existing client details:\n\n" \
@@ -353,7 +355,7 @@ elif client_type == '3':
         if job_seeker_details:
             # Send email with the job seeker details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'av@datanetiix.com'
+            receiver_email = 'rengarajan@datanetiix.com'
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, New job seeker logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"Job Seeker details:\n\n" \
@@ -371,6 +373,9 @@ elif client_type == '3':
         
     except Exception as e:
         print(str(e))
+
+elif client_type == '4':
+    print("Bye!")
                 
 else:
     print("Invalid option. Please choose a valid option.")
