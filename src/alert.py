@@ -2,11 +2,12 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-def send_email(sender_email, receiver_email, subject, message):
+def send_email(sender_email, receiver_emails, cc_email , subject, message):
     # Create a multipart message container
     msg = MIMEMultipart()
     msg['From'] = sender_email
-    msg['To'] = receiver_email
+    msg['To'] = ', '.join(receiver_emails)
+    msg['Cc'] = cc_email
     msg['Subject'] = subject
 
     # Add the message body
@@ -25,7 +26,8 @@ def send_email(sender_email, receiver_email, subject, message):
         server.login(smtp_username, smtp_password)
 
         # Send the email
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+        all_recipients = receiver_emails + [cc_email]
+        server.sendmail(sender_email, all_recipients, msg.as_string())
 
         print('Email sent successfully!')
     except Exception as e:

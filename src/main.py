@@ -280,7 +280,8 @@ if client_type == '1':
         if new_client_details:
             # Send email with the new client details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'rengarajan@datanetiix.com'
+            receiver_emails = ['rengarajan@datanetiix.com', 'jenipher@datanetiix.com']
+            cc_email = 'av@datanetiix.com'
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, new user logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"New client details:\n\n" \
@@ -293,7 +294,7 @@ if client_type == '1':
                             f"Verticals: {new_client_details['verticals_choosen']}\n" \
                             f"Requirements: {new_client_details['requirement']}\n" \
                             f"Known Source: {new_client_details['known_source']}"
-            send_email(sender_email, receiver_email, subject, email_message)
+            send_email(sender_email, receiver_emails, cc_email, subject, email_message)
 
 
     except Exception as e:
@@ -316,7 +317,8 @@ elif client_type == '2':
         if existing_client_details:
             # Send email with the existing client details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'rengarajan@datanetiix.com'
+            receiver_emails = ['rengarajan@datanetiix.com', 'jenipher@datanetiix.com']
+            cc_email = 'av@datanetiix.com'
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, one of our client logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"Existing client details:\n\n" \
@@ -328,7 +330,7 @@ elif client_type == '2':
                             f"Verticals: {existing_client_details['verticals_choosen']}\n" \
                             f"Escalating issue to: {existing_client_details['issue_escalation']}\n" \
                             f"Type of issue: {existing_client_details['issue_type']}"
-            send_email(sender_email, receiver_email, subject, email_message)
+            send_email(sender_email, receiver_emails, cc_email, subject, email_message)
    
     except Exception as e:
         print(str(e))
@@ -355,7 +357,8 @@ elif client_type == '3':
         if job_seeker_details:
             # Send email with the job seeker details
             sender_email = 'photola.datanetiix@gmail.com'
-            receiver_email = 'rengarajan@datanetiix.com'
+            receiver_emails = ['rengarajan@datanetiix.com', 'jenipher@datanetiix.com']
+            cc_email = 'av@datanetiix.com'
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, New job seeker logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"Job Seeker details:\n\n" \
@@ -369,7 +372,7 @@ elif client_type == '3':
                             f"Available for Interview: {job_seeker_details['interview_available']}\n" \
                             f"Available date for interview: {job_seeker_details['time_available']}\n" \
                             f"Notice period: {job_seeker_details['notice_period']}"
-            send_email(sender_email, receiver_email, subject, email_message)
+            send_email(sender_email, receiver_emails, cc_email, subject, email_message)
         
     except Exception as e:
         print(str(e))
