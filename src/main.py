@@ -6,6 +6,8 @@ from database import extract_new_client_details, extract_existing_client_details
 from alert import send_email
 from dotenv import load_dotenv
 import os
+from flask import Flask, request, jsonify
+
 
 
 create_database()
