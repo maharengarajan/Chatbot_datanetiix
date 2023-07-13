@@ -6,8 +6,6 @@ from database import extract_new_client_details, extract_existing_client_details
 from alert import send_email
 from dotenv import load_dotenv
 import os
-from flask import Flask, request, jsonify
-
 
 
 create_database()
@@ -53,7 +51,7 @@ def get_weather_greeting():
 def get_valid_name():
     while True:
         name = input('Please enter your name: ')
-        if re.match(r'^[A-Za-z\s]+$', name):
+        if re.match(r'^[A-Za-z\s]+$', name.strip()):
             return name
         else:
             print("Please enter a valid name")
