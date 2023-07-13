@@ -103,7 +103,78 @@ def is_valid_contact_number(contact):
         return True
     else:
         return False
+    
+@app.route('/industries', methods=['POST'])
+def industries():
+    industries = {
+        '1': 'Insurance',
+        '2': 'Banking',
+        '3': 'Finance',
+        '4': 'IT',
+        '5': 'Healthcare',
+        '6': 'Internet',
+        '7': 'Automobile',
+        '8': 'Others'
+    }
 
+    selected_options = request.get_json().get('selected_options', [])
+    selected_industries = [industries[opt] for opt in selected_options if opt in industries]
+
+    return jsonify({'selected_industries': selected_industries})
+
+@app.route('/verticals', methods=['POST'])
+def verticals():
+    verticals = {
+        '1': 'ML/DS/AI',
+        '2': 'Sales force',
+        '3': 'Microsoft dynamics',
+        '4': 'Custom app',
+        '5': 'Others'
+    }
+
+    selected_options = request.get_json().get('selected_options', [])
+    selected_verticals = [verticals[opt] for opt in selected_options if opt in verticals]
+
+    return jsonify({'selected_verticals': selected_verticals})
+
+@app.route('/requirement', methods=['POST'])
+def requirement():
+    requirements = {
+        '1': 'Start the project from scratch',
+        '2': 'Require support from existing project',
+        '3': 'Looking for some kind of solutions',
+        '4': 'Others'
+    }
+
+    selected_option = request.get_json().get('selected_option')
+
+    if selected_option in requirements:
+        selected_requirement = requirements[selected_option]
+        return jsonify({'selected_requirement': selected_requirement})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+
+@app.route('/known_source', methods=['POST'])
+def known_source():
+    known_sources = {
+        '1': 'Google',
+        '2': 'LinkedIn',
+        '3': 'Email Campaign',
+        '4': 'Known resources',
+        '5': 'Others'
+    }
+
+    selected_option = request.get_json().get('selected_option')
+
+    if selected_option in known_sources:
+        if selected_option in ['4', '5']:
+            source_specification = request.get_json().get('source_specification')
+            selected_known_source = known_sources[selected_option] + " : " + source_specification
+        else:
+            selected_known_source = known_sources[selected_option]
+        return jsonify({'selected_known_source': selected_known_source})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
 
 if __name__ == '__main__':
     app.run()
