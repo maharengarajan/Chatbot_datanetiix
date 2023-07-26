@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from datetime import datetime
 import requests
 
 app = Flask(__name__)
@@ -175,6 +176,75 @@ def known_source():
         return jsonify({'selected_known_source': selected_known_source})
     else:
         return jsonify({'message': 'Please choose a valid option.'})
+    
+@app.route('/issue_escalation', methods=['POST'])
+def issue_escalation():
+    issue_escalation_options = {
+        '1': 'Team Lead',
+        '2': 'Sales Person',
+        '3': 'Escalate Issue'
+    }
+    selected_option = request.get_json().get('selected_option')
+    if selected_option in issue_escalation_options:
+        selected_issue_escalation = issue_escalation_options[selected_option]
+        return jsonify({'selected_isse_type': selected_issue_escalation})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+    
+@app.route('/issue_type', methods=['POST'])
+def issue_type():
+    issue_type_options = {
+        '1': 'Normal',
+        '2': 'Urgent'
+    }
+    user_response = request.get_json().get('user_response')
+    if user_response in issue_type_options:
+        selected_issue_escalation=issue_type_options[user_response]
+        return jsonify({'user_response':selected_issue_escalation})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+    
+@app.route('/interview_avail', methods=['POST'])
+def interview_available_check():
+    interview_avail_options = {
+        '1': 'Yes',
+        '2': 'No'
+    }
+    user_response = request.get_json().get('user_response')
+    if user_response in interview_avail_options:
+        selected_interview_avail=interview_avail_options[user_response]
+        return jsonify({'selected_interview_avail':selected_interview_avail})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+    
+@app.route('/date-of-interview', methods=['POST'])
+def date_of_interview():
+    data = request.get_json()
+    time_avail = data.get('time_avail')
+
+    try:
+        datetime.strptime(time_avail, "%d/%m/%Y")
+        if datetime.strptime(time_avail, "%d/%m/%Y").date() < datetime.now().date():
+            return jsonify({"error": "Please enter a valid future date"}), 400
+        else:
+            return jsonify({"time_avail": time_avail})
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Please enter the date in dd/mm/yyyy format."}), 400
+    
+@app.route('/notice-period', methods=['POST'])
+def notice_period():
+    notice_period_options = {
+        '1': '30 days',
+        '2': '60 days',
+        '3': '90 days'
+    }
+    data = request.get_json()
+    joining_date = data.get('joining_date')
+
+    if joining_date in notice_period_options:
+        return jsonify({"joining_date": notice_period_options[joining_date]})
+    else:
+        return jsonify({"error": "Invalid input. Please select a valid option."}), 400
 
 if __name__ == '__main__':
     app.run()
