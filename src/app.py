@@ -7,14 +7,14 @@ app = Flask(__name__)
 def get_ip_address():
     response = requests.get('https://api.ipify.org').text
     return response
-
+    
 def get_location():
     ip_address = get_ip_address()
     response = requests.get(f'https://ipapi.co/{ip_address}/city/').text
     city = response
-    return city
+    return city    
 
-def get_weather():
+def get_weather(): 
     city = get_location()
     weather_api_key = '01e6399113b4c255c497958efccc0dc9'
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}"
@@ -38,7 +38,7 @@ def get_weather_greeting():
         return "Take extra precautions due to {} in the area.".format(weather_desc)
     else:
         return "Enjoy your time!"
-
+        
 @app.route('/greeting', methods=['GET'])
 def get_greeting():
     ip_location = get_location()
@@ -46,6 +46,8 @@ def get_greeting():
     greeting = "Hello, buddy! Welcome to Datanetiix! We hope you're connecting from"
     message = "{} {}. {}".format(greeting, ip_location, weather_info_greet)
     return jsonify({'message': message})
+        
+ 
 
 @app.route('/client', methods=['POST'])
 def client():
