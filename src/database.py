@@ -4,18 +4,18 @@ import sys
 
 def create_database():
     # Connection from Python to MySQL
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123')
 
     # Creating a pointer to the MySQL database
     cursor = mydb.cursor()
 
     # Create database if it doesn't exist
-    cursor.execute("CREATE DATABASE IF NOT EXISTS chatbot_priya")
+    cursor.execute("CREATE DATABASE IF NOT EXISTS Chatbot_Datanetiix")
 
     # Create tables and columns if they don't exist
-    cursor.execute('CREATE TABLE IF NOT EXISTS chatbot_priya.New_Client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), INDUSTRY VARCHAR(255), VERTICAL VARCHAR(255), REQUIREMENTS VARCHAR(255), KNOWN_SOURCE VARCHAR(255))')
-    cursor.execute('CREATE TABLE IF NOT EXISTS chatbot_priya.Existing_Client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), VERTICAL VARCHAR(255), ISSUE_ESCALATION VARCHAR(255), ISSUE_TYPE VARCHAR(255))')
-    cursor.execute('CREATE TABLE IF NOT EXISTS chatbot_priya.Job_Seeker(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), CATEGORY VARCHAR(255), VERTICAL VARCHAR(255), INTERVIEW_AVAILABLE VARCHAR(255), TIME_AVAILABLE VARCHAR(255), NOTICE_PERIOD VARCHAR(255))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.new_client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), INDUSTRY VARCHAR(255), VERTICAL VARCHAR(255), REQUIREMENTS VARCHAR(255), KNOWN_SOURCE VARCHAR(255))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.existing_client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), VERTICAL VARCHAR(255), ISSUE_ESCALATION VARCHAR(255), ISSUE_TYPE VARCHAR(255))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.job_seeker(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), CATEGORY VARCHAR(255), VERTICAL VARCHAR(255), INTERVIEW_AVAILABLE VARCHAR(255), TIME_AVAILABLE VARCHAR(255), NOTICE_PERIOD VARCHAR(255))')
     
     # Get current date and time
     current_date = datetime.datetime.now().date()
@@ -25,7 +25,7 @@ def create_database():
     mydb.close()
     
 def insert_new_client(name, email, contact, industry_options, vertical_options, requirement_option, known_source):
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
     cursor = mydb.cursor()
 
     # Get current date and time
@@ -37,7 +37,7 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
     vertical_str = ','.join(vertical_options)
 
     # Prepare the SQL query to insert data into the table
-    query = "INSERT INTO New_Client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, INDUSTRY, VERTICAL, REQUIREMENTS, KNOWN_SOURCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO new_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, INDUSTRY, VERTICAL, REQUIREMENTS, KNOWN_SOURCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (current_date, current_time, name, email, contact, industry_str, vertical_str, requirement_option, known_source)
 
     
@@ -52,7 +52,7 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
     mydb.close() 
     
 def insert_existing_client(name, email, contact, vertical_options, issue_escalation, issue_type):
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
     cursor = mydb.cursor()
     
     # Get current date and time
@@ -63,7 +63,7 @@ def insert_existing_client(name, email, contact, vertical_options, issue_escalat
     vertical_str = ','.join(vertical_options)
     
     # Prepare the SQL query to insert data into the table
-    query = "INSERT INTO Existing_Client(DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, VERTICAL, ISSUE_ESCALATION, ISSUE_TYPE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO existing_client(DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, VERTICAL, ISSUE_ESCALATION, ISSUE_TYPE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
     values = (current_date, current_time, name, email, contact, vertical_str, issue_escalation, issue_type)
     
     # Execute the query
@@ -77,7 +77,7 @@ def insert_existing_client(name, email, contact, vertical_options, issue_escalat
     mydb.close()
     
 def insert_job_seeker(name, email, contact, user_category, vertical_options, is_available, interview_date, joining_date):
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
     cursor = mydb.cursor()
     
     # Get current date and time
@@ -103,13 +103,13 @@ def insert_job_seeker(name, email, contact, user_category, vertical_options, is_
 
 def extract_new_client_details():
     #connection to mysql database
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
     
     #create cursor object to execute SQL queries
     cursor = mydb.cursor()
     
     #execute sql query to retrive new_client details
-    query = "SELECT * FROM New_client ORDER BY id DESC LIMIT 1" #we can get the row with highest id value 
+    query = "SELECT * FROM new_client ORDER BY id DESC LIMIT 1" #we can get the row with highest id value 
     cursor.execute(query)
     
     # Fetch the result
@@ -144,7 +144,7 @@ def extract_new_client_details():
 
 def extract_existing_client_details():
     #connection to mysql database
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
     
     #create cursor object to execute SQL queries
     cursor = mydb.cursor()
@@ -184,7 +184,7 @@ def extract_existing_client_details():
 
 def extract_job_seeker_details():
     #connection to mysql database
-    mydb = conn.connect(host='localhost', user='root', password='M18ara10@', database='chatbot_priya')
+    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
     
     #create cursor object to execute SQL queries
     cursor = mydb.cursor()

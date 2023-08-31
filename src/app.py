@@ -67,8 +67,6 @@ def get_greeting():
         message_2 = greeting
         return jsonify({'message': message_2})
         
- 
-
 @app.route('/client', methods=['POST'])
 def client():
     client_type = request.get_json().get('client_type')
