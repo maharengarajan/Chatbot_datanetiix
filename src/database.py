@@ -1,10 +1,11 @@
 import mysql.connector as conn
 import datetime
 import sys
+from config import DATABASE_CONFIG, DATABASE_CONNECTION_CONFIG
 
 def create_database():
     # Connection from Python to MySQL
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123')
+    mydb = conn.connect(**DATABASE_CONNECTION_CONFIG)
 
     # Creating a pointer to the MySQL database
     cursor = mydb.cursor()
@@ -25,7 +26,10 @@ def create_database():
     mydb.close()
     
 def insert_new_client(name, email, contact, industry_options, vertical_options, requirement_option, known_source):
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
+    # Connection from Python to MySQL
+    mydb = conn.connect(**DATABASE_CONFIG)
+    
+    # Creating a pointer to the MySQL database
     cursor = mydb.cursor()
 
     # Get current date and time
@@ -39,7 +43,6 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
     # Prepare the SQL query to insert data into the table
     query = "INSERT INTO new_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, INDUSTRY, VERTICAL, REQUIREMENTS, KNOWN_SOURCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (current_date, current_time, name, email, contact, industry_str, vertical_str, requirement_option, known_source)
-
     
     # Execute the query
     cursor.execute(query, values)
@@ -52,7 +55,10 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
     mydb.close() 
     
 def insert_existing_client(name, email, contact, vertical_options, issue_escalation, issue_type):
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
+    # Connection from Python to MySQL
+    mydb = conn.connect(**DATABASE_CONFIG)
+
+    # Creating a pointer to the MySQL database
     cursor = mydb.cursor()
     
     # Get current date and time
@@ -77,7 +83,10 @@ def insert_existing_client(name, email, contact, vertical_options, issue_escalat
     mydb.close()
     
 def insert_job_seeker(name, email, contact, user_category, vertical_options, is_available, interview_date, joining_date):
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
+    # Connection from Python to MySQL
+    mydb = conn.connect(**DATABASE_CONFIG)
+
+    # Creating a pointer to the MySQL database
     cursor = mydb.cursor()
     
     # Get current date and time
@@ -102,10 +111,10 @@ def insert_job_seeker(name, email, contact, user_category, vertical_options, is_
     mydb.close()
 
 def extract_new_client_details():
-    #connection to mysql database
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
-    
-    #create cursor object to execute SQL queries
+    # Connection from Python to MySQL
+    mydb = conn.connect(**DATABASE_CONFIG)
+
+    # Creating a pointer to the MySQL database
     cursor = mydb.cursor()
     
     #execute sql query to retrive new_client details
@@ -144,8 +153,8 @@ def extract_new_client_details():
 
 def extract_existing_client_details():
     #connection to mysql database
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
-    
+    mydb = conn.connect(**DATABASE_CONFIG)
+
     #create cursor object to execute SQL queries
     cursor = mydb.cursor()
     
@@ -184,8 +193,8 @@ def extract_existing_client_details():
 
 def extract_job_seeker_details():
     #connection to mysql database
-    mydb = conn.connect(host='localhost', user='root', password='Admin@123', database='Chatbot_Datanetiix')
-    
+    mydb = conn.connect(**DATABASE_CONFIG)
+
     #create cursor object to execute SQL queries
     cursor = mydb.cursor()
     
