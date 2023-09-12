@@ -1,6 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from config import SMTP_server_settings
 
 def send_email(sender_email, receiver_emails, cc_email , subject, message):
     # Create a multipart message container
@@ -13,11 +14,11 @@ def send_email(sender_email, receiver_emails, cc_email , subject, message):
     # Add the message body
     msg.attach(MIMEText(message, 'plain'))
 
-    # SMTP server settings
-    smtp_server = 'smtp.gmail.com'
-    smtp_port = 587
-    smtp_username = 'photola.datanetiix@gmail.com'
-    smtp_password = 'uloxazedvwjjkafl'
+    # Access the SMTP settings
+    smtp_server = SMTP_server_settings['smtp_server']
+    smtp_port = SMTP_server_settings['smtp_port']
+    smtp_username = SMTP_server_settings['smtp_username']
+    smtp_password = SMTP_server_settings['smtp_password']
 
     try:
         # Create a secure connection with the SMTP server
@@ -37,7 +38,7 @@ def send_email(sender_email, receiver_emails, cc_email , subject, message):
         server.quit()
 
 # Example usage
-sender_email = 'photola.datanetiix@gmail.com'
-receiver_email = 'rengarajan@datanetiix.com'
-subject = 'chatbot project'
-message = 'This is a test email sent from Rengarajan.'
+#sender_email = 'photola.datanetiix@gmail.com'
+#receiver_email = 'rengarajan@datanetiix.com'
+#subject = 'chatbot project'
+#message = 'This is a test email sent from Rengarajan.'

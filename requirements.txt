@@ -1,2 +1,7 @@
+regex
 requests
 datetime
+Flask
+smtplib
+email
+mysql-connector-python

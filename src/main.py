@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from database import insert_new_client, insert_existing_client, insert_job_seeker, create_database
 from database import extract_new_client_details, extract_existing_client_details, extract_job_seeker_details
+from config import email_alert_config
 from alert import send_email
 from dotenv import load_dotenv
 import os
@@ -279,9 +280,9 @@ if client_type == '1':
         
         if new_client_details:
             # Send email with the new client details
-            sender_email = 'photola.datanetiix@gmail.com'
-            receiver_emails = ['rengarajan@datanetiix.com', 'jenipher@datanetiix.com']
-            cc_email = 'av@datanetiix.com'
+            sender_email = email_alert_config['sender_email']
+            receiver_emails = email_alert_config['receiver_emails']
+            cc_email = email_alert_config['cc_email']
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, new user logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"New client details:\n\n" \
@@ -316,9 +317,9 @@ elif client_type == '2':
 
         if existing_client_details:
             # Send email with the existing client details
-            sender_email = 'photola.datanetiix@gmail.com'
-            receiver_emails = ['rengarajan@datanetiix.com', 'jenipher@datanetiix.com']
-            cc_email = 'av@datanetiix.com'
+            sender_email = email_alert_config['sender_email']
+            receiver_emails = email_alert_config['receiver_emails']
+            cc_email = email_alert_config['cc_email']
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, one of our client logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"Existing client details:\n\n" \
@@ -356,9 +357,9 @@ elif client_type == '3':
 
         if job_seeker_details:
             # Send email with the job seeker details
-            sender_email = 'photola.datanetiix@gmail.com'
-            receiver_emails = ['rengarajan@datanetiix.com', 'jenipher@datanetiix.com']
-            cc_email = 'av@datanetiix.com'
+            sender_email = email_alert_config['sender_email']
+            receiver_emails = email_alert_config['receiver_emails']
+            cc_email = email_alert_config['cc_email']
             subject = 'Datanetiix chatbot project Email alert testing demo'
             email_message = f"Hi, New job seeker logged in our chatbot, Find the below details for your reference:\n\n" \
                             f"Job Seeker details:\n\n" \
