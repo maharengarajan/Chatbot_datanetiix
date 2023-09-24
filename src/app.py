@@ -267,4 +267,4 @@ def notice_period():
         return jsonify({"error": "Invalid input. Please select a valid option."}), 400
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0",debug=True,port=5100)
