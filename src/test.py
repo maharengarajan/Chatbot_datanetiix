@@ -66,7 +66,7 @@ def industries():
     data = request.get_json()
     row_id = data.get('row_id')  # Get the user ID from the request
 
-    selected_options = request.get_json().get('selected_options', [])
+    selected_options = data.get('selected_options', [])
     selected_industries = [industries[opt] for opt in selected_options if opt in industries]
 
     industry_str = ','.join(selected_industries) # Convert lists to strings
@@ -91,7 +91,7 @@ def verticals():
     data = request.get_json()
     row_id = data.get('row_id')  # Get the user ID from the request
 
-    selected_options = request.get_json().get('selected_options', [])
+    selected_options = data.get('selected_options', [])
     selected_verticals = [verticals[opt] for opt in selected_options if opt in verticals]
 
     vertical_str = ','.join(selected_verticals)
@@ -101,12 +101,67 @@ def verticals():
     cursor.execute(query, values)
     mydb.commit()
 
-    # Close the cursor and connection
-    #cursor.close()
-    #mydb.close()
-
     return jsonify({'selected_verticals': selected_verticals})
 
+@app.route('/chatbot/new_client/user_details/industries/verticals/requirement', methods=['POST'])
+def requirement():
+    requirements = {
+        '1': 'Start the project from scratch',
+        '2': 'Require support from existing project',
+        '3': 'Looking for some kind of solutions',
+        '4': 'Others'
+    }
 
+    data = request.get_json()
+    selected_option = data.get('selected_option')
+    row_id = data.get('row_id')  # Get the user ID from the request
+
+    if selected_option in requirements:
+        selected_requirement = requirements[selected_option]
+
+        query = "UPDATE new_client SET REQUIREMENTS = %s WHERE ID = %s"
+        values = (selected_requirement,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        return jsonify({'selected_requirement': selected_requirement})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+    
+@app.route('/chatbot/new_client/user_details/industries/verticals/requirement/known_source', methods=['POST'])
+def known_source():
+    known_sources = {
+        '1': 'Google',
+        '2': 'LinkedIn',
+        '3': 'Email Campaign',
+        '4': 'Known resources',
+        '5': 'Others'
+    }
+
+    data = request.get_json()
+    selected_option = data.get('selected_option')
+    row_id = data.get('row_id')  # Get the user ID from the request
+
+    if selected_option in known_sources:
+        if selected_option in ['4', '5']:
+            source_specification = request.get_json().get('source_specification')
+            selected_known_source = known_sources[selected_option] + " : " + source_specification
+        else:
+            selected_known_source = known_sources[selected_option]
+
+        query = "UPDATE new_client SET KNOWN_SOURCE = %s WHERE ID = %s"
+        values = (selected_known_source,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        # Close the cursor and connection
+        cursor.close()
+        mydb.close()
+
+        return jsonify({'selected_known_source': selected_known_source})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+    
+        
 if __name__ == '__main__':
     app.run()
