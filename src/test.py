@@ -300,7 +300,160 @@ def issue_type():
         return jsonify({'user_response':selected_issue_type, 'message': response_message})
     else:
         return jsonify({'message': 'Please choose a valid option.'})
+    
+#this API responsible for collecting user details from job seeker and save in DB
+@app.route('/chatbot/job_seeker_details', methods=['POST'])
+def job_seeker_details():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    contact = data.get('contact')
 
+    if not is_valid_name(name):
+        return jsonify({'message': 'Please enter a valid name.'})
+
+    if not is_valid_email(email):
+        return jsonify({'message': 'Please enter a valid email address.'})
+
+    if not is_valid_contact_number(contact):
+        return jsonify({'message': 'Please enter a valid contact number.'})
+    
+    user_details = {
+        'name': name,
+        'email': email,
+        'contact': contact
+    }
+
+    query = "INSERT INTO job_seeker (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
+    values = (current_date, current_time, name, email, contact)
+    cursor.execute(query, values)
+    row_id = cursor.lastrowid 
+    mydb.commit()  
+
+    return jsonify({'message': 'User details collected successfully.', 'row_id': row_id})
+
+def is_valid_name(name):
+    return bool(re.match(r'^[A-Za-z\s]+$', name.strip()))
+
+def is_valid_email(email):
+    return bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email))
+
+def is_valid_contact_number(contact):
+    return bool(re.match(r'^\+?\d{1,3}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$', contact))
+
+#this API responsible for collecting user category of job seeker and save in DB
+@app.route('/chatbot/job_seeker_details/category', methods=['POST'])
+def category():
+    category_type = {
+        '1': 'fresher',
+        '2': 'experienced'
+    }
+
+    data = request.get_json()
+    row_id = data.get('row_id')
+    
+    user_type = data.get('user_type')
+    if user_type in category_type:
+        selected_category_type = category_type[user_type]
+
+        query = "UPDATE job_seeker SET category = %s WHERE ID = %s"
+        values = (selected_category_type,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        return jsonify({'user_type': selected_category_type, 'row_id': row_id})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+    
+# this API is responsible for selecting verticals for job seeker and save in DB
+@app.route('/chatbot/job_seeker_details/category/verticals', methods=['POST'])
+def verticals_job_seeker():
+    verticals = {
+        '1': 'ML/DS/AI',
+        '2': 'Sales force',
+        '3': 'Microsoft dynamics',
+        '4': 'Custom app',
+        '5': 'Others'
+    }
+
+    data = request.get_json()
+    row_id = data.get('row_id')  
+
+    selected_options = data.get('selected_options', [])
+    selected_verticals = [verticals[opt] for opt in selected_options if opt in verticals]
+
+    vertical_str = ','.join(selected_verticals)
+
+    query = "UPDATE job_seeker SET VERTICAL = %s WHERE ID = %s"
+    values = (vertical_str,row_id)
+    cursor.execute(query, values)
+    mydb.commit()
+
+    return jsonify({'selected_verticals': selected_verticals})
+
+#this API responsible for checking user availability for an interview
+@app.route('/chatbot/job_seeker_details/category/verticals/interview_avail', methods=['POST'])
+def interview_available_check():
+    interview_avail_options = {
+        '1': 'Yes',
+        '2': 'No'
+    }
+
+    data = request.get_json()
+    row_id = data.get('row_id')
+
+    user_response = data.get('user_response')
+    if user_response in interview_avail_options:
+        selected_interview_avail=interview_avail_options[user_response]
+
+        query = "UPDATE job_seeker SET INTERVIEW_AVAILABLE = %s WHERE ID = %s"
+        values = (selected_interview_avail,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        return jsonify({'selected_interview_avail':selected_interview_avail, 'row_id':row_id})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+
+#this API responsible for checking date for an interview  
+# in the frontend we have to provide calender    
+@app.route('/chatbot/job_seeker_details/category/verticals/interview_avail/date_of_interview', methods=['POST'])
+def date_of_interview():
+    data = request.get_json()
+    row_id = data.get('row_id')
+    interview_date = data.get('interview_date')
+
+    query = "UPDATE job_seeker SET TIME_AVAILABLE = %s WHERE ID = %s"
+    values = (interview_date,row_id)
+    cursor.execute(query, values)
+    mydb.commit()
+    return jsonify({'interview_date': interview_date, 'row_id':row_id})
+
+@app.route('/chatbot/job_seeker_details/category/verticals/interview_avail/date_of_interview/notice_period', methods=['POST'])
+def notice_period():
+    notice_period_options = {
+        '1': '30 days',
+        '2': '60 days',
+        '3': '90 days'
+    }
+    data = request.get_json()
+    row_id = data.get('row_id')
+
+    joining_date = data.get('joining_date')
+    if joining_date in notice_period_options:
+        selected_notice_period_options = notice_period_options[joining_date]
+
+        query = "UPDATE job_seeker SET NOTICE_PERIOD = %s WHERE ID = %s"
+        values = (selected_notice_period_options,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        return jsonify({"joining_date": selected_notice_period_options, 'row_id': row_id})
+    else:
+        return jsonify({"error": "Invalid input. Please select a valid option."}), 400
+
+ 
+    
         
 if __name__ == '__main__':
     app.run()
