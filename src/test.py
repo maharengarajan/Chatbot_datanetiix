@@ -12,8 +12,23 @@ cursor = mydb.cursor()
 current_date = datetime.now().date()
 current_time = datetime.now().time()
 
-@app.route('/chatbot/new_client/user_details', methods=['POST'])
-def user_details():
+#this API responsible for choosing client type
+@app.route('/chatbot/client', methods=['POST'])
+def client():
+    client_type = request.get_json().get('client_type')
+    
+    welcome_messages = {
+        '1': 'Welcome, New client!',
+        '2': 'Welcome, existing client!',
+        '3': 'Welcome, Job seeker!',
+        '4': 'Bye!'
+    }   
+    message = welcome_messages.get(client_type, 'Invalid option. Please choose a valid option.')   
+    return jsonify({'message': message})
+
+#this API responsible for collecting user details from new client and save in DB
+@app.route('/chatbot/new_client_details', methods=['POST'])
+def new_client_details():
     data = request.get_json()
     name = data.get('name')
     email = data.get('email')
@@ -51,6 +66,7 @@ def is_valid_email(email):
 def is_valid_contact_number(contact):
     return bool(re.match(r'^\+?\d{1,3}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$', contact))
 
+# this API is responsible for selecting industries
 @app.route('/chatbot/new_client/user_details/industries', methods=['POST'])
 def industries():
     industries = {
@@ -78,8 +94,9 @@ def industries():
 
     return jsonify({'selected_industries': selected_industries})
 
+# this API is responsible for selecting verticals
 @app.route('/chatbot/new_client/user_details/industries/verticals', methods=['POST'])
-def verticals():
+def verticals_new_client():
     verticals = {
         '1': 'ML/DS/AI',
         '2': 'Sales force',
@@ -103,6 +120,7 @@ def verticals():
 
     return jsonify({'selected_verticals': selected_verticals})
 
+# this API is responsible for selecting requirements
 @app.route('/chatbot/new_client/user_details/industries/verticals/requirement', methods=['POST'])
 def requirement():
     requirements = {
@@ -127,7 +145,8 @@ def requirement():
         return jsonify({'selected_requirement': selected_requirement})
     else:
         return jsonify({'message': 'Please choose a valid option.'})
-    
+
+# this API is responsible for selecting known sources    
 @app.route('/chatbot/new_client/user_details/industries/verticals/requirement/known_source', methods=['POST'])
 def known_source():
     known_sources = {
@@ -162,6 +181,126 @@ def known_source():
     else:
         return jsonify({'message': 'Please choose a valid option.'})
     
+#this API responsible for collecting user details
+@app.route('/chatbot/existing_client_details', methods=['POST'])
+def existing_client_details():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    contact = data.get('contact')
+
+    if not is_valid_name(name):
+        return jsonify({'message': 'Please enter a valid name.'})
+
+    if not is_valid_email(email):
+        return jsonify({'message': 'Please enter a valid email address.'})
+
+    if not is_valid_contact_number(contact):
+        return jsonify({'message': 'Please enter a valid contact number.'})
+    
+    user_details = {
+        'name': name,
+        'email': email,
+        'contact': contact
+    }
+
+    query = "INSERT INTO existing_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
+    values = (current_date, current_time, name, email, contact)
+    cursor.execute(query, values)
+    row_id = cursor.lastrowid # Get the ID (primary key) of the inserted row
+    mydb.commit()  # Commit the changes to the database
+
+    return jsonify({'message': 'User details collected successfully.', 'row_id': row_id})
+
+def is_valid_name(name):
+    return bool(re.match(r'^[A-Za-z\s]+$', name.strip()))
+
+def is_valid_email(email):
+    return bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email))
+
+def is_valid_contact_number(contact):
+    return bool(re.match(r'^\+?\d{1,3}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$', contact))
+
+# this API is responsible for selecting verticals for existing client and save in DB
+@app.route('/chatbot/existing_client_details/verticals', methods=['POST'])
+def verticals_exixting_client():
+    verticals = {
+        '1': 'ML/DS/AI',
+        '2': 'Sales force',
+        '3': 'Microsoft dynamics',
+        '4': 'Custom app',
+        '5': 'Others'
+    }
+
+    data = request.get_json()
+    row_id = data.get('row_id')  
+
+    selected_options = data.get('selected_options', [])
+    selected_verticals = [verticals[opt] for opt in selected_options if opt in verticals]
+
+    vertical_str = ','.join(selected_verticals)
+
+    query = "UPDATE existing_client SET VERTICAL = %s WHERE ID = %s"
+    values = (vertical_str,row_id)
+    cursor.execute(query, values)
+    mydb.commit()
+
+    return jsonify({'selected_verticals': selected_verticals})
+
+# this API is responsible for selecting issue_escalation for existing client and save in DB
+@app.route('/chatbot/existing_client_details/verticals/issue_escalation', methods=['POST'])
+def issue_escalation():
+    issue_escalation_options = {
+        '1': 'Team Lead',
+        '2': 'Sales Person',
+        '3': 'Escalate Issue'
+    }
+
+    data = request.get_json()
+    row_id = data.get('row_id')
+
+    selected_option = data.get('selected_option')
+    if selected_option in issue_escalation_options:
+        selected_issue_escalation = issue_escalation_options[selected_option]
+
+        query = "UPDATE existing_client SET ISSUE_ESCALATION = %s WHERE ID = %s"
+        values = (selected_issue_escalation,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        return jsonify({'selected_isse_type': selected_issue_escalation})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+
+# this API is responsible for selecting issue_type for existing client and save in DB    
+@app.route('/chatbot/existing_client_details/verticals/issue_escalation/issue_type', methods=['POST'])
+def issue_type():
+    issue_type_options = {
+        '1': 'Normal',
+        '2': 'Urgent'
+    }
+
+    data = request.get_json()
+    row_id = data.get('row_id')
+
+    user_response = data.get('user_response')
+    if user_response in issue_type_options:
+        selected_issue_type=issue_type_options[user_response]
+
+        if selected_issue_type == 'Normal':
+            response_message = "Thank you. We have saved your issue and will contact you as soon as possible."
+        elif selected_issue_type == 'Urgent':
+            response_message = "Thank you. We have saved your issue as urgent and will contact you immediately."
+
+        query = "UPDATE existing_client SET ISSUE_TYPE = %s WHERE ID = %s"
+        values = (selected_issue_type,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
+
+        return jsonify({'user_response':selected_issue_type, 'message': response_message})
+    else:
+        return jsonify({'message': 'Please choose a valid option.'})
+
         
 if __name__ == '__main__':
     app.run()
