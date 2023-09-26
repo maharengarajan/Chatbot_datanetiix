@@ -36,7 +36,7 @@ def insert_new_client(name, email, contact, industry_options, vertical_options, 
     current_date = datetime.datetime.now().date()
     current_time = datetime.datetime.now().time()
     
-     # Convert lists to strings
+    # Convert lists to strings
     industry_str = ','.join(industry_options)
     vertical_str = ','.join(vertical_options)
 
