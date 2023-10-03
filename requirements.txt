@@ -6,3 +6,5 @@ smtplib
 email
 mysql-connector-python
 gunicorn
+waitress
+box
