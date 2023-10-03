@@ -5,6 +5,7 @@ import requests
 import mysql.connector as conn
 from config import DATABASE_CONFIG
 
+
 app = Flask(__name__)
 
 mydb = conn.connect(**DATABASE_CONFIG)
@@ -80,47 +81,55 @@ def get_greeting():
 #this API responsible for choosing client type
 @app.route('/chatbot/client', methods=['POST'])
 def client():
-    client_type = request.get_json().get('client_type')
+    try:
+        data = request.get_json()
+        client_type = data.get('client_type')
+        
+        welcome_messages = {
+            '1': 'Welcome, New client!',
+            '2': 'Welcome, existing client!',
+            '3': 'Welcome, Job seeker!',
+            '4': 'Bye!'
+        }   
+        message = welcome_messages.get(client_type, 'Invalid option. Please choose a valid option.') 
+        status_code = 200 if client_type in welcome_messages else 400  
+        return jsonify({'message': message, 'status': 'success', 'code': status_code})
+    except Exception as e:
+        raise e
     
-    welcome_messages = {
-        '1': 'Welcome, New client!',
-        '2': 'Welcome, existing client!',
-        '3': 'Welcome, Job seeker!',
-        '4': 'Bye!'
-    }   
-    message = welcome_messages.get(client_type, 'Invalid option. Please choose a valid option.')   
-    return jsonify({'message': message})
-
 #this API responsible for collecting user details from new client and save in DB
 @app.route('/chatbot/new_client_details', methods=['POST'])
 def new_client_details():
-    data = request.get_json()
-    name = data.get('name')
-    email = data.get('email')
-    contact = data.get('contact')
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        email = data.get('email')
+        contact = data.get('contact')
 
-    if not is_valid_name(name):
-        return jsonify({'message': 'Please enter a valid name.'})
+        if not is_valid_name(name):
+            return jsonify({'message': 'Please enter a valid name.', 'status': 400})
 
-    if not is_valid_email(email):
-        return jsonify({'message': 'Please enter a valid email address.'})
+        if not is_valid_email(email):
+            return jsonify({'message': 'Please enter a valid email address.', 'status': 400})
 
-    if not is_valid_contact_number(contact):
-        return jsonify({'message': 'Please enter a valid contact number.'})
-    
-    user_details = {
-        'name': name,
-        'email': email,
-        'contact': contact
-    }
+        if not is_valid_contact_number(contact):
+            return jsonify({'message': 'Please enter a valid contact number.', 'status': 400})
+        
+        user_details = {
+            'name': name,
+            'email': email,
+            'contact': contact
+        }
 
-    query = "INSERT INTO new_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
-    values = (current_date, current_time, name, email, contact)
-    cursor.execute(query, values)
-    row_id = cursor.lastrowid # Get the ID (primary key) of the inserted row
-    mydb.commit()  # Commit the changes to the database
+        query = "INSERT INTO new_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
+        values = (current_date, current_time, name, email, contact)
+        cursor.execute(query, values)
+        row_id = cursor.lastrowid # Get the ID (primary key) of the inserted row
+        mydb.commit()  # Commit the changes to the database
 
-    return jsonify({'message': 'User details collected successfully.', 'row_id': row_id})
+        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'status': 200})
+    except Exception as e:
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
 
 def is_valid_name(name):
     return bool(re.match(r'^[A-Za-z\s]+$', name.strip()))
@@ -519,4 +528,4 @@ def notice_period():
         return jsonify({"error": "Invalid input. Please select a valid option."}), 400    
         
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0",debug=True,port=8000)
