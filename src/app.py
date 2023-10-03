@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 #from flask_cors import CORS
 from config import DATABASE_CONFIG, EMAIL_ALERT_CONFIG
@@ -8,6 +9,7 @@ import re
 import requests
 import mysql.connector as conn
 from logger import logger
+from dotenv import load_dotenv
 
 
 app = Flask(__name__)
@@ -20,6 +22,9 @@ cursor = mydb.cursor()
 
 current_date = datetime.now().date()
 current_time = datetime.now().time()
+
+def configure():
+    load_dotenv()
 
 def get_ip_address():
     try:
@@ -43,8 +48,8 @@ def get_weather():
     if not city:
         return None
     try:
-        weather_api_key = '01e6399113b4c255c497958efccc0dc9'
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}"
+        configure()
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('weather_api_key')}"
         response = requests.get(url).json()
 
         if response.get('cod') == 200:
