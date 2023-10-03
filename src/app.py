@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from datetime import datetime
 import re
 import requests
@@ -6,8 +7,10 @@ import mysql.connector as conn
 from logger import logger
 from config import DATABASE_CONFIG
 
-
 app = Flask(__name__)
+
+app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app)
 
 mydb = conn.connect(**DATABASE_CONFIG)
 cursor = mydb.cursor()
@@ -97,7 +100,7 @@ def client():
         logger.info('client welcome message shown')
         return jsonify({'message': message, 'code': status_code})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
     
 #this API responsible for collecting user details from new client and save in DB
 @app.route('/chatbot/new_client_details', methods=['POST'])
@@ -109,13 +112,13 @@ def new_client_details():
         contact = data.get('contact')
 
         if not is_valid_name(name):
-            return jsonify({'message': 'Please enter a valid name.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid name.', 'code': 400})
 
         if not is_valid_email(email):
-            return jsonify({'message': 'Please enter a valid email address.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid email address.', 'code': 400})
 
         if not is_valid_contact_number(contact):
-            return jsonify({'message': 'Please enter a valid contact number.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid contact number.', 'code': 400})
         
         user_details = {
             'name': name,
@@ -129,10 +132,10 @@ def new_client_details():
         row_id = cursor.lastrowid # Get the ID (primary key) of the inserted row
         mydb.commit()  # Commit the changes to the database
 
-        logger.info('User details collected successfully')
-        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'status': 200})
+
+        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 def is_valid_name(name):
     return bool(re.match(r'^[A-Za-z\s]+$', name.strip()))
@@ -170,9 +173,9 @@ def industries():
         cursor.execute(query, values)
         mydb.commit()
 
-        return jsonify({'selected_industries': selected_industries, 'status': 200})
+        return jsonify({'selected_industries': selected_industries, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 # this API is responsible for selecting verticals
 @app.route('/chatbot/new_client/user_details/industries/verticals', methods=['POST'])
@@ -199,9 +202,9 @@ def verticals_new_client():
         cursor.execute(query, values)
         mydb.commit()
 
-        return jsonify({'selected_verticals': selected_verticals, 'status': 200})
+        return jsonify({'selected_verticals': selected_verticals, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 # this API is responsible for selecting requirements
 @app.route('/chatbot/new_client/user_details/industries/verticals/requirement', methods=['POST'])
@@ -226,11 +229,11 @@ def requirement():
             cursor.execute(query, values)
             mydb.commit()
 
-            return jsonify({'selected_requirement': selected_requirement, 'status': 200})
+            return jsonify({'selected_requirement': selected_requirement, 'code': 200})
         else:
-            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+            return jsonify({'message': 'Please choose a valid option.', 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 # this API is responsible for selecting known sources    
 @app.route('/chatbot/new_client/user_details/industries/verticals/requirement/known_source', methods=['POST'])
@@ -264,11 +267,11 @@ def known_source():
             cursor.close()
             mydb.close()
 
-            return jsonify({'selected_known_source': selected_known_source, 'status': 200})
+            return jsonify({'selected_known_source': selected_known_source, 'code': 200})
         else:
-            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+            return jsonify({'message': 'Please choose a valid option.', 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
     
 #this API responsible for collecting user details
@@ -281,13 +284,13 @@ def existing_client_details():
         contact = data.get('contact')
 
         if not is_valid_name(name):
-            return jsonify({'message': 'Please enter a valid name.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid name.', 'code': 400})
 
         if not is_valid_email(email):
-            return jsonify({'message': 'Please enter a valid email address.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid email address.', 'code': 400})
 
         if not is_valid_contact_number(contact):
-            return jsonify({'message': 'Please enter a valid contact number.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid contact number.', 'code': 400})
         
         user_details = {
             'name': name,
@@ -301,9 +304,9 @@ def existing_client_details():
         row_id = cursor.lastrowid # Get the ID (primary key) of the inserted row
         mydb.commit()  # Commit the changes to the database
 
-        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'status': 200})
+        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 def is_valid_name(name):
     return bool(re.match(r'^[A-Za-z\s]+$', name.strip()))
@@ -339,9 +342,9 @@ def verticals_exixting_client():
         cursor.execute(query, values)
         mydb.commit()
 
-        return jsonify({'selected_verticals': selected_verticals, 'status': 200})
+        return jsonify({'selected_verticals': selected_verticals, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
     
 
 # this API is responsible for selecting issue_escalation for existing client and save in DB
@@ -366,11 +369,11 @@ def issue_escalation():
             cursor.execute(query, values)
             mydb.commit()
 
-            return jsonify({'selected_isse_type': selected_issue_escalation, 'status': 200})
+            return jsonify({'selected_isse_type': selected_issue_escalation, 'code': 200})
         else:
-            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+            return jsonify({'message': 'Please choose a valid option.', 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
         
 
 # this API is responsible for selecting issue_type for existing client and save in DB    
@@ -399,11 +402,11 @@ def issue_type():
             cursor.execute(query, values)
             mydb.commit()
 
-            return jsonify({'user_response':selected_issue_type, 'message': response_message, 'status': 200})
+            return jsonify({'user_response':selected_issue_type, 'message': response_message, 'code': 200})
         else:
-            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+            return jsonify({'message': 'Please choose a valid option.', 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
     
     
 #this API responsible for collecting user details from job seeker and save in DB
@@ -416,13 +419,13 @@ def job_seeker_details():
         contact = data.get('contact')
 
         if not is_valid_name(name):
-            return jsonify({'message': 'Please enter a valid name.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid name.', 'code': 400})
 
         if not is_valid_email(email):
-            return jsonify({'message': 'Please enter a valid email address.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid email address.', 'code': 400})
 
         if not is_valid_contact_number(contact):
-            return jsonify({'message': 'Please enter a valid contact number.', 'status': 400})
+            return jsonify({'message': 'Please enter a valid contact number.', 'code': 400})
         
         user_details = {
             'name': name,
@@ -436,9 +439,9 @@ def job_seeker_details():
         row_id = cursor.lastrowid 
         mydb.commit()  
 
-        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'status': 200})
+        return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 def is_valid_name(name):
     return bool(re.match(r'^[A-Za-z\s]+$', name.strip()))
@@ -470,11 +473,11 @@ def category():
             cursor.execute(query, values)
             mydb.commit()
 
-            return jsonify({'user_type': selected_category_type, 'row_id': row_id, 'status': 200})
+            return jsonify({'user_type': selected_category_type, 'row_id': row_id, 'code': 200})
         else:
-            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+            return jsonify({'message': 'Please choose a valid option.', 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
     
 # this API is responsible for selecting verticals for job seeker and save in DB
 @app.route('/chatbot/job_seeker_details/category/verticals', methods=['POST'])
@@ -501,9 +504,9 @@ def verticals_job_seeker():
         cursor.execute(query, values)
         mydb.commit()
 
-        return jsonify({'selected_verticals': selected_verticals, 'status': 200})
+        return jsonify({'selected_verticals': selected_verticals, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 #this API responsible for checking user availability for an interview
 @app.route('/chatbot/job_seeker_details/category/verticals/interview_avail', methods=['POST'])
@@ -526,11 +529,11 @@ def interview_available_check():
             cursor.execute(query, values)
             mydb.commit()
 
-            return jsonify({'selected_interview_avail':selected_interview_avail, 'row_id':row_id, 'status': 200})
+            return jsonify({'selected_interview_avail':selected_interview_avail, 'row_id':row_id, 'code': 200})
         else:
-            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+            return jsonify({'message': 'Please choose a valid option.', 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 #this API responsible for checking date for an interview  
 # in the frontend we have to provide calender    
@@ -545,9 +548,9 @@ def date_of_interview():
         values = (interview_date,row_id)
         cursor.execute(query, values)
         mydb.commit()
-        return jsonify({'interview_date': interview_date, 'row_id':row_id, 'status': 200})
+        return jsonify({'interview_date': interview_date, 'row_id':row_id, 'code': 200})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
 
 #this API responsible for checking notice period
 @app.route('/chatbot/job_seeker_details/category/verticals/interview_avail/date_of_interview/notice_period', methods=['POST'])
@@ -570,11 +573,11 @@ def notice_period():
             cursor.execute(query, values)
             mydb.commit()
 
-            return jsonify({"joining_date": selected_notice_period_options, 'row_id': row_id, 'status': 200})
+            return jsonify({"joining_date": selected_notice_period_options, 'row_id': row_id, 'code': 200})
         else:
-            return jsonify({"error": "Invalid input. Please select a valid option.", 'status': 400})
+            return jsonify({"error": "Invalid input. Please select a valid option.", 'code': 400})
     except Exception as e:
-        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'code': 500})
             
 if __name__ == '__main__':
     app.run()
