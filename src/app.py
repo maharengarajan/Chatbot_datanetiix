@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 #from flask_cors import CORS
-from config import DATABASE_CONFIG, email_alert_config
-from database import extract_new_client_details
+from config import DATABASE_CONFIG, EMAIL_ALERT_CONFIG
+from database import extract_new_client_details, extract_existing_client_details
 from alert import send_email
 from datetime import datetime
 import re
@@ -271,9 +271,9 @@ def known_source():
 
             ## Send email with the new client details
             if new_client_details:
-                sender_email = email_alert_config['sender_email']
-                receiver_emails = email_alert_config['receiver_emails']
-                cc_email = email_alert_config['cc_email']
+                sender_email = EMAIL_ALERT_CONFIG['sender_email']
+                receiver_emails = EMAIL_ALERT_CONFIG['receiver_emails']
+                cc_email = EMAIL_ALERT_CONFIG['cc_email']
                 subject = 'Datanetiix chatbot project Email alert testing demo'
                 email_message = f"Hi, new user logged in our chatbot, Find the below details for your reference:\n\n" \
                                 f"New client details:\n\n" \
@@ -426,6 +426,27 @@ def issue_type():
             values = (selected_issue_type,row_id)
             cursor.execute(query, values)
             mydb.commit()
+
+            # Extract the new client details from the database
+            existing_client_details = extract_existing_client_details()
+
+            # Send email with the existing client details
+            if existing_client_details:          
+                sender_email = EMAIL_ALERT_CONFIG['sender_email']
+                receiver_emails = EMAIL_ALERT_CONFIG['receiver_emails']
+                cc_email = EMAIL_ALERT_CONFIG['cc_email']
+                subject = 'Datanetiix chatbot project Email alert testing demo'
+                email_message = f"Hi, one of our client logged in our chatbot, Find the below details for your reference:\n\n" \
+                                f"Existing client details:\n\n" \
+                                f"Date: {existing_client_details['date']}\n" \
+                                f"Time: {existing_client_details['time']}\n" \
+                                f"Name: {existing_client_details['name']}\n" \
+                                f"Email: {existing_client_details['email']}\n" \
+                                f"Contact: {existing_client_details['contact']}\n" \
+                                f"Verticals: {existing_client_details['verticals_choosen']}\n" \
+                                f"Escalating issue to: {existing_client_details['issue_escalation']}\n" \
+                                f"Type of issue: {existing_client_details['issue_type']}"
+                send_email(sender_email, receiver_emails, cc_email, subject, email_message)
 
             return jsonify({'user_response':selected_issue_type, 'message': response_message, 'code': 200})
         else:
