@@ -3,6 +3,7 @@ from datetime import datetime
 import re
 import requests
 import mysql.connector as conn
+from logger import logger
 from config import DATABASE_CONFIG
 
 
@@ -93,9 +94,10 @@ def client():
         }   
         message = welcome_messages.get(client_type, 'Invalid option. Please choose a valid option.') 
         status_code = 200 if client_type in welcome_messages else 400  
-        return jsonify({'message': message, 'status': 'success', 'code': status_code})
+        logger.info('client welcome message shown')
+        return jsonify({'message': message, 'code': status_code})
     except Exception as e:
-        raise e
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
     
 #this API responsible for collecting user details from new client and save in DB
 @app.route('/chatbot/new_client_details', methods=['POST'])
@@ -127,6 +129,7 @@ def new_client_details():
         row_id = cursor.lastrowid # Get the ID (primary key) of the inserted row
         mydb.commit()  # Commit the changes to the database
 
+        logger.info('User details collected successfully')
         return jsonify({'message': 'User details collected successfully.', 'row_id': row_id, 'status': 200})
     except Exception as e:
         return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
@@ -143,117 +146,130 @@ def is_valid_contact_number(contact):
 # this API is responsible for selecting industries
 @app.route('/chatbot/new_client/user_details/industries', methods=['POST'])
 def industries():
-    industries = {
-        '1': 'Insurance',
-        '2': 'Banking',
-        '3': 'Finance',
-        '4': 'IT',
-        '5': 'Healthcare',
-        '6': 'Internet',
-        '7': 'Automobile',
-        '8': 'Others'
-    }
-    data = request.get_json()
-    row_id = data.get('row_id')  # Get the user ID from the request
+    try:
+        industries = {
+            '1': 'Insurance',
+            '2': 'Banking',
+            '3': 'Finance',
+            '4': 'IT',
+            '5': 'Healthcare',
+            '6': 'Internet',
+            '7': 'Automobile',
+            '8': 'Others'
+        }
+        data = request.get_json()
+        row_id = data.get('row_id')  # Get the user ID from the request
 
-    selected_options = data.get('selected_options', [])
-    selected_industries = [industries[opt] for opt in selected_options if opt in industries]
+        selected_options = data.get('selected_options', [])
+        selected_industries = [industries[opt] for opt in selected_options if opt in industries]
 
-    industry_str = ','.join(selected_industries) # Convert lists to strings
+        industry_str = ','.join(selected_industries) # Convert lists to strings
 
-    query = "UPDATE new_client SET INDUSTRY = %s WHERE ID = %s"
-    values = (industry_str,row_id)
-    cursor.execute(query, values)
-    mydb.commit()
+        query = "UPDATE new_client SET INDUSTRY = %s WHERE ID = %s"
+        values = (industry_str,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
 
-    return jsonify({'selected_industries': selected_industries})
+        return jsonify({'selected_industries': selected_industries, 'status': 200})
+    except Exception as e:
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
 
 # this API is responsible for selecting verticals
 @app.route('/chatbot/new_client/user_details/industries/verticals', methods=['POST'])
 def verticals_new_client():
-    verticals = {
-        '1': 'ML/DS/AI',
-        '2': 'Sales force',
-        '3': 'Microsoft dynamics',
-        '4': 'Custom app',
-        '5': 'Others'
-    }
+    try:
+        verticals = {
+            '1': 'ML/DS/AI',
+            '2': 'Sales force',
+            '3': 'Microsoft dynamics',
+            '4': 'Custom app',
+            '5': 'Others'
+        }
 
-    data = request.get_json()
-    row_id = data.get('row_id')  # Get the user ID from the request
+        data = request.get_json()
+        row_id = data.get('row_id')  # Get the user ID from the request
 
-    selected_options = data.get('selected_options', [])
-    selected_verticals = [verticals[opt] for opt in selected_options if opt in verticals]
+        selected_options = data.get('selected_options', [])
+        selected_verticals = [verticals[opt] for opt in selected_options if opt in verticals]
 
-    vertical_str = ','.join(selected_verticals)
+        vertical_str = ','.join(selected_verticals)
 
-    query = "UPDATE new_client SET VERTICAL = %s WHERE ID = %s"
-    values = (vertical_str,row_id)
-    cursor.execute(query, values)
-    mydb.commit()
+        query = "UPDATE new_client SET VERTICAL = %s WHERE ID = %s"
+        values = (vertical_str,row_id)
+        cursor.execute(query, values)
+        mydb.commit()
 
-    return jsonify({'selected_verticals': selected_verticals})
+        return jsonify({'selected_verticals': selected_verticals, 'status': 200})
+    except Exception as e:
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
 
 # this API is responsible for selecting requirements
 @app.route('/chatbot/new_client/user_details/industries/verticals/requirement', methods=['POST'])
 def requirement():
-    requirements = {
-        '1': 'Start the project from scratch',
-        '2': 'Require support from existing project',
-        '3': 'Looking for some kind of solutions',
-        '4': 'Others'
-    }
+    try:
+        requirements = {
+            '1': 'Start the project from scratch',
+            '2': 'Require support from existing project',
+            '3': 'Looking for some kind of solutions',
+            '4': 'Others'
+        }
 
-    data = request.get_json()
-    selected_option = data.get('selected_option')
-    row_id = data.get('row_id')  # Get the user ID from the request
+        data = request.get_json()
+        selected_option = data.get('selected_option')
+        row_id = data.get('row_id')  # Get the user ID from the request
 
-    if selected_option in requirements:
-        selected_requirement = requirements[selected_option]
+        if selected_option in requirements:
+            selected_requirement = requirements[selected_option]
 
-        query = "UPDATE new_client SET REQUIREMENTS = %s WHERE ID = %s"
-        values = (selected_requirement,row_id)
-        cursor.execute(query, values)
-        mydb.commit()
+            query = "UPDATE new_client SET REQUIREMENTS = %s WHERE ID = %s"
+            values = (selected_requirement,row_id)
+            cursor.execute(query, values)
+            mydb.commit()
 
-        return jsonify({'selected_requirement': selected_requirement})
-    else:
-        return jsonify({'message': 'Please choose a valid option.'})
+            return jsonify({'selected_requirement': selected_requirement, 'status': 200})
+        else:
+            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+    except Exception as e:
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
 
 # this API is responsible for selecting known sources    
 @app.route('/chatbot/new_client/user_details/industries/verticals/requirement/known_source', methods=['POST'])
 def known_source():
-    known_sources = {
-        '1': 'Google',
-        '2': 'LinkedIn',
-        '3': 'Email Campaign',
-        '4': 'Known resources',
-        '5': 'Others'
-    }
+    try:
+        known_sources = {
+            '1': 'Google',
+            '2': 'LinkedIn',
+            '3': 'Email Campaign',
+            '4': 'Known resources',
+            '5': 'Others'
+        }
 
-    data = request.get_json()
-    selected_option = data.get('selected_option')
-    row_id = data.get('row_id')  # Get the user ID from the request
+        data = request.get_json()
+        selected_option = data.get('selected_option')
+        row_id = data.get('row_id')  # Get the user ID from the request
 
-    if selected_option in known_sources:
-        if selected_option in ['4', '5']:
-            source_specification = request.get_json().get('source_specification')
-            selected_known_source = known_sources[selected_option] + " : " + source_specification
+        if selected_option in known_sources:
+            if selected_option in ['4', '5']:
+                source_specification = request.get_json().get('source_specification')
+                selected_known_source = known_sources[selected_option] + " : " + source_specification
+            else:
+                selected_known_source = known_sources[selected_option]
+
+            query = "UPDATE new_client SET KNOWN_SOURCE = %s WHERE ID = %s"
+            values = (selected_known_source,row_id)
+            cursor.execute(query, values)
+            mydb.commit()
+
+            # Close the cursor and connection
+            cursor.close()
+            mydb.close()
+
+            return jsonify({'selected_known_source': selected_known_source, 'status': 200})
         else:
-            selected_known_source = known_sources[selected_option]
+            return jsonify({'message': 'Please choose a valid option.', 'status': 400})
+    except Exception as e:
+        return jsonify({'message': 'Internal server error.', 'error': str(e), 'status': 500})
 
-        query = "UPDATE new_client SET KNOWN_SOURCE = %s WHERE ID = %s"
-        values = (selected_known_source,row_id)
-        cursor.execute(query, values)
-        mydb.commit()
-
-        # Close the cursor and connection
-        cursor.close()
-        mydb.close()
-
-        return jsonify({'selected_known_source': selected_known_source})
-    else:
-        return jsonify({'message': 'Please choose a valid option.'})
     
 #this API responsible for collecting user details
 @app.route('/chatbot/existing_client_details', methods=['POST'])
@@ -528,4 +544,4 @@ def notice_period():
         return jsonify({"error": "Invalid input. Please select a valid option."}), 400    
         
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True,port=8000)
+    app.run()
