@@ -5,3 +5,4 @@ Flask
 smtplib
 email
 mysql-connector-python
+gunicorn
