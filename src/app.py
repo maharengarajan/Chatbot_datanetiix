@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 #from flask_cors import CORS
 from config import DATABASE_CONFIG, EMAIL_ALERT_CONFIG
-from database import extract_new_client_details, extract_existing_client_details
+from database import extract_new_client_details, extract_existing_client_details, extract_job_seeker_details
 from alert import send_email
 from datetime import datetime
 import re
@@ -618,6 +618,30 @@ def notice_period():
             values = (selected_notice_period_options,row_id)
             cursor.execute(query, values)
             mydb.commit()
+
+            # Extract the new client details from the database
+            job_seeker_details = extract_job_seeker_details()
+
+            if job_seeker_details:
+            # Send email with the job seeker details
+                sender_email = EMAIL_ALERT_CONFIG['sender_email']
+                receiver_emails = EMAIL_ALERT_CONFIG['receiver_emails']
+                cc_email = EMAIL_ALERT_CONFIG['cc_email']
+                subject = 'Datanetiix chatbot project Email alert testing demo'
+                email_message = f"Hi, New job seeker logged in our chatbot, Find the below details for your reference:\n\n" \
+                                f"Job Seeker details:\n\n" \
+                                f"Date: {job_seeker_details['date']}\n" \
+                                f"Time: {job_seeker_details['time']}\n" \
+                                f"Name: {job_seeker_details['name']}\n" \
+                                f"Email: {job_seeker_details['email']}\n" \
+                                f"Contact: {job_seeker_details['contact']}\n" \
+                                f"User category: {job_seeker_details['category']}\n" \
+                                f"Verticals: {job_seeker_details['verticals_choosen']}\n" \
+                                f"Available for Interview: {job_seeker_details['interview_available']}\n" \
+                                f"Available date for interview: {job_seeker_details['time_available']}\n" \
+                                f"Notice period: {job_seeker_details['notice_period']}"
+                send_email(sender_email, receiver_emails, cc_email, subject, email_message)
+            
 
             return jsonify({"joining_date": selected_notice_period_options, 'row_id': row_id, 'code': 200})
         else:
