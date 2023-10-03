@@ -1,16 +1,19 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
+#from flask_cors import CORS
+from config import DATABASE_CONFIG, email_alert_config
+from database import extract_new_client_details
+from alert import send_email
 from datetime import datetime
 import re
 import requests
 import mysql.connector as conn
 from logger import logger
-from config import DATABASE_CONFIG
+
 
 app = Flask(__name__)
 
-app.config['CORS_HEADERS'] = 'Content-Type'
-CORS(app)
+#app.config['CORS_HEADERS'] = 'Content-Type'
+#CORS(app)
 
 mydb = conn.connect(**DATABASE_CONFIG)
 cursor = mydb.cursor()
@@ -262,6 +265,28 @@ def known_source():
             values = (selected_known_source,row_id)
             cursor.execute(query, values)
             mydb.commit()
+
+            #extract new client details
+            new_client_details = extract_new_client_details()
+
+            ## Send email with the new client details
+            if new_client_details:
+                sender_email = email_alert_config['sender_email']
+                receiver_emails = email_alert_config['receiver_emails']
+                cc_email = email_alert_config['cc_email']
+                subject = 'Datanetiix chatbot project Email alert testing demo'
+                email_message = f"Hi, new user logged in our chatbot, Find the below details for your reference:\n\n" \
+                                f"New client details:\n\n" \
+                                f"Date: {new_client_details['date']}\n" \
+                                f"Time: {new_client_details['time']}\n" \
+                                f"Name: {new_client_details['name']}\n" \
+                                f"Email: {new_client_details['email']}\n" \
+                                f"Contact: {new_client_details['contact']}\n" \
+                                f"Industries: {new_client_details['industries_choosen']}\n" \
+                                f"Verticals: {new_client_details['verticals_choosen']}\n" \
+                                f"Requirements: {new_client_details['requirement']}\n" \
+                                f"Known Source: {new_client_details['known_source']}"
+                send_email(sender_email, receiver_emails, cc_email, subject, email_message)
 
             # Close the cursor and connection
             cursor.close()
