@@ -16,13 +16,13 @@ def create_database():
 
     # Create tables and columns if they don't exist
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.new_client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), INDUSTRY VARCHAR(255), VERTICAL VARCHAR(255), REQUIREMENTS VARCHAR(255), KNOWN_SOURCE VARCHAR(255))"
+        "CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.new_client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, IP_ADDRESS VARCHAR(45), NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), COMPANY_NAME VARCHAR(500), INDUSTRY VARCHAR(255), VERTICAL VARCHAR(255), REQUIREMENTS VARCHAR(255), KNOWN_SOURCE VARCHAR(255))"
     )
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.existing_client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), VERTICAL VARCHAR(255), ISSUE_ESCALATION VARCHAR(255), ISSUE_TYPE VARCHAR(255))"
+        "CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.existing_client(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, IP_ADDRESS VARCHAR(45), NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), COMPANY_NAME VARCHAR(500), VERTICAL VARCHAR(255), ISSUE_ESCALATION VARCHAR(255), ISSUE_TYPE VARCHAR(255))"
     )
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.job_seeker(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), CATEGORY VARCHAR(255), VERTICAL VARCHAR(255), INTERVIEW_AVAILABLE VARCHAR(255), TIME_AVAILABLE VARCHAR(255), NOTICE_PERIOD VARCHAR(255))"
+        "CREATE TABLE IF NOT EXISTS Chatbot_Datanetiix.job_seeker(ID INT AUTO_INCREMENT PRIMARY KEY, DATE DATE, TIME TIME, IP_ADDRESS VARCHAR(45), NAME VARCHAR(255), EMAIL_ID VARCHAR(255), CONTACT_NUMBER VARCHAR(255), CATEGORY VARCHAR(255), VERTICAL VARCHAR(255), INTERVIEW_AVAILABLE VARCHAR(255), TIME_AVAILABLE VARCHAR(255), NOTICE_PERIOD VARCHAR(255))"
     )
 
     # Get current date and time
@@ -34,9 +34,11 @@ def create_database():
 
 
 def insert_new_client(
+    ip_address,
     name,
     email,
     contact,
+    company,
     industry_options,
     vertical_options,
     requirement_option,
@@ -57,13 +59,15 @@ def insert_new_client(
     vertical_str = ",".join(vertical_options)
 
     # Prepare the SQL query to insert data into the table
-    query = "INSERT INTO new_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, INDUSTRY, VERTICAL, REQUIREMENTS, KNOWN_SOURCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO new_client (DATE, TIME, IP_ADDRESS, NAME, EMAIL_ID, CONTACT_NUMBER, COMPANY_NAME, INDUSTRY, VERTICAL, REQUIREMENTS, KNOWN_SOURCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (
         current_date,
         current_time,
+        ip_address,
         name,
         email,
         contact,
+        company,
         industry_str,
         vertical_str,
         requirement_option,
@@ -82,7 +86,14 @@ def insert_new_client(
 
 
 def insert_existing_client(
-    name, email, contact, vertical_options, issue_escalation, issue_type
+    ip_address,
+    name,
+    email,
+    contact,
+    company, 
+    vertical_options, 
+    issue_escalation, 
+    issue_type
 ):
     # Connection from Python to MySQL
     mydb = conn.connect(**DATABASE_CONFIG)
@@ -98,13 +109,15 @@ def insert_existing_client(
     vertical_str = ",".join(vertical_options)
 
     # Prepare the SQL query to insert data into the table
-    query = "INSERT INTO existing_client(DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, VERTICAL, ISSUE_ESCALATION, ISSUE_TYPE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO existing_client(DATE, TIME, IP_ADDRESS, NAME, EMAIL_ID, CONTACT_NUMBER, COMPANY_NAME, VERTICAL, ISSUE_ESCALATION, ISSUE_TYPE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (
         current_date,
         current_time,
+        ip_address,
         name,
         email,
         contact,
+        company,
         vertical_str,
         issue_escalation,
         issue_type,
@@ -122,6 +135,7 @@ def insert_existing_client(
 
 
 def insert_job_seeker(
+    ip_address,
     name,
     email,
     contact,
@@ -145,10 +159,11 @@ def insert_job_seeker(
     vertical_str = ",".join(vertical_options)
 
     # Prepare the SQL query to insert data into the table
-    query = "INSERT INTO job_seeker(DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER, CATEGORY, VERTICAL, INTERVIEW_AVAILABLE, TIME_AVAILABLE, NOTICE_PERIOD) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO job_seeker(DATE, TIME, IP_ADDRESS, NAME, EMAIL_ID, CONTACT_NUMBER, CATEGORY, VERTICAL, INTERVIEW_AVAILABLE, TIME_AVAILABLE, NOTICE_PERIOD) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (
         current_date,
         current_time,
+        ip_address,
         name,
         email,
         contact,
@@ -193,6 +208,8 @@ def extract_new_client_details():
             name,
             email,
             contact,
+            company,
+            ip_address,
             selected_industry,
             selected_vertical,
             requirement,
@@ -207,6 +224,8 @@ def extract_new_client_details():
             "name": name,
             "email": email,
             "contact": contact,
+            "company": company,
+            "ip_address":ip_address,
             "industries_choosen": selected_industry,
             "verticals_choosen": selected_vertical,
             "requirement": requirement,
@@ -246,6 +265,8 @@ def extract_existing_client_details():
             name,
             email,
             contact,
+            company,
+            ip_address,
             selected_vertical,
             issue_escalation,
             issue_type,
@@ -259,6 +280,8 @@ def extract_existing_client_details():
             "name": name,
             "email": email,
             "contact": contact,
+            "company": company,
+            "ip_address":ip_address,
             "verticals_choosen": selected_vertical,
             "issue_escalation": issue_escalation,
             "issue_type": issue_type,
@@ -297,6 +320,7 @@ def extract_job_seeker_details():
             name,
             email,
             contact,
+            ip_address,
             category,
             selected_vertical,
             interview_available,
@@ -312,6 +336,7 @@ def extract_job_seeker_details():
             "name": name,
             "email": email,
             "contact": contact,
+            "ip_address":ip_address,
             "category": category,
             "verticals_choosen": selected_vertical,
             "interview_available": interview_available,

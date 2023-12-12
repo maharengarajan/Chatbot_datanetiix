@@ -130,10 +130,12 @@ def client():
 @app.route("/chatbot/new_client_details", methods=["POST"])
 def new_client_details():
     try:
+        ip_address = get_ip_address()
         data = request.get_json()
         name = data.get("name")
         email = data.get("email")
         contact = data.get("contact")
+        company = data.get("company")
 
         if not is_valid_name(name):
             return jsonify({"message": "Please enter a valid name.", "code": 400})
@@ -148,10 +150,10 @@ def new_client_details():
                 {"message": "Please enter a valid contact number.", "code": 400}
             )
 
-        user_details = {"name": name, "email": email, "contact": contact}
+        user_details = {"ip_address":ip_address, "name": name, "email": email, "contact": contact, "company":company}
 
-        query = "INSERT INTO new_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
-        values = (current_date, current_time, name, email, contact)
+        query = "INSERT INTO new_client (DATE, TIME, IP_ADDRESS, NAME, EMAIL_ID, CONTACT_NUMBER, COMPANY_NAME) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        values = (current_date, current_time, name, email, contact, company, ip_address)
         cursor.execute(query, values)
         row_id = cursor.lastrowid  # Get the ID (primary key) of the inserted row
         mydb.commit()  # Commit the changes to the database
@@ -302,8 +304,9 @@ def known_source():
             "1": "Google",
             "2": "LinkedIn",
             "3": "Email Campaign",
-            "4": "Known resources",
-            "5": "Others",
+            "4": "News Letter",
+            "5": "Known resources",
+            "6": "Others",
         }
 
         data = request.get_json()
@@ -311,7 +314,7 @@ def known_source():
         row_id = data.get("row_id")  # Get the user ID from the request
 
         if selected_option in known_sources:
-            if selected_option in ["4", "5"]:
+            if selected_option in ["5", "6"]:
                 source_specification = request.get_json().get("source_specification")
                 selected_known_source = (
                     known_sources[selected_option] + " : " + source_specification
@@ -338,9 +341,11 @@ def known_source():
                     f"New client details:\n\n"
                     f"Date: {new_client_details['date']}\n"
                     f"Time: {new_client_details['time']}\n"
+                    f"IP: {new_client_details['ip_address']}\n"
                     f"Name: {new_client_details['name']}\n"
                     f"Email: {new_client_details['email']}\n"
                     f"Contact: {new_client_details['contact']}\n"
+                    f"Company: {new_client_details['company']}\n"
                     f"Industries: {new_client_details['industries_choosen']}\n"
                     f"Verticals: {new_client_details['verticals_choosen']}\n"
                     f"Requirements: {new_client_details['requirement']}\n"
@@ -369,10 +374,12 @@ def known_source():
 @app.route("/chatbot/existing_client_details", methods=["POST"])
 def existing_client_details():
     try:
+        ip_address = get_ip_address()
         data = request.get_json()
         name = data.get("name")
         email = data.get("email")
         contact = data.get("contact")
+        company = data.get("company")
 
         if not is_valid_name(name):
             return jsonify({"message": "Please enter a valid name.", "code": 400})
@@ -387,10 +394,10 @@ def existing_client_details():
                 {"message": "Please enter a valid contact number.", "code": 400}
             )
 
-        user_details = {"name": name, "email": email, "contact": contact}
+        user_details = {"ip_address":ip_address, "name": name, "email": email, "contact": contact, "company": company}
 
-        query = "INSERT INTO existing_client (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
-        values = (current_date, current_time, name, email, contact)
+        query = "INSERT INTO existing_client (DATE, TIME, IP_ADDRESS, NAME, EMAIL_ID, CONTACT_NUMBER, COMPANY_NAME) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        values = (current_date, current_time, name, email, contact, company, ip_address)
         cursor.execute(query, values)
         row_id = cursor.lastrowid  # Get the ID (primary key) of the inserted row
         mydb.commit()  # Commit the changes to the database
@@ -534,9 +541,11 @@ def issue_type():
                     f"Existing client details:\n\n"
                     f"Date: {existing_client_details['date']}\n"
                     f"Time: {existing_client_details['time']}\n"
+                    f"IP: {existing_client_details['ip_address']}\n"
                     f"Name: {existing_client_details['name']}\n"
                     f"Email: {existing_client_details['email']}\n"
                     f"Contact: {existing_client_details['contact']}\n"
+                    f"Company: {existing_client_details['company']}\n"
                     f"Verticals: {existing_client_details['verticals_choosen']}\n"
                     f"Escalating issue to: {existing_client_details['issue_escalation']}\n"
                     f"Type of issue: {existing_client_details['issue_type']}"
@@ -564,6 +573,7 @@ def issue_type():
 @app.route("/chatbot/job_seeker_details", methods=["POST"])
 def job_seeker_details():
     try:
+        ip_address = get_ip_address()
         data = request.get_json()
         name = data.get("name")
         email = data.get("email")
@@ -582,10 +592,10 @@ def job_seeker_details():
                 {"message": "Please enter a valid contact number.", "code": 400}
             )
 
-        user_details = {"name": name, "email": email, "contact": contact}
+        user_details = {"ip_address":ip_address, "name": name, "email": email, "contact": contact}
 
-        query = "INSERT INTO job_seeker (DATE, TIME, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s)"
-        values = (current_date, current_time, name, email, contact)
+        query = "INSERT INTO job_seeker (DATE, TIME, IP_ADDRESS, NAME, EMAIL_ID, CONTACT_NUMBER) VALUES (%s, %s, %s, %s, %s, %s)"
+        values = (current_date, current_time, name, email, contact, ip_address)
         cursor.execute(query, values)
         row_id = cursor.lastrowid
         mydb.commit()
@@ -777,6 +787,7 @@ def notice_period():
                     f"Job Seeker details:\n\n"
                     f"Date: {job_seeker_details['date']}\n"
                     f"Time: {job_seeker_details['time']}\n"
+                    f"IP: {job_seeker_details['ip_address']}\n"
                     f"Name: {job_seeker_details['name']}\n"
                     f"Email: {job_seeker_details['email']}\n"
                     f"Contact: {job_seeker_details['contact']}\n"
